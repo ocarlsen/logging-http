@@ -1,2 +1,3 @@
 # logging-http
-Library for logging HTTP requests and responses on server and client
+
+A library for logging HTTP requests and responses on server and client.

@@ -4,15 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ocarlsen.logging</groupId>
-    <artifactId>logging-http-aggregator</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>logging-http</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Logging Web</name>
+    <name>Logging HTTP</name>
 
     <modules>
         <module>logging-http-parent</module>
-        <module>logging-http-filter</module>
-        <module>logging-http-interceptor</module>
+        <module>logging-http-client</module>
+        <module>logging-http-server</module>
     </modules>
 </project>
