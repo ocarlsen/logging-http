@@ -52,8 +52,8 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = ResponseLoggingInterceptorIT.Config.class)
-public class ResponseLoggingInterceptorIT {
+@ContextConfiguration(classes = ResponseLoggingInterceptorSpringBootIT.Config.class)
+public class ResponseLoggingInterceptorSpringBootIT {
 
     private static final String CONTROLLER_URI = "/response_logging_test";
     private static final String BODY = "body";

@@ -39,8 +39,8 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ResponseLoggingInterceptorTest.Config.class})
-public class ResponseLoggingInterceptorTest {
+@ContextConfiguration(classes = {ResponseLoggingInterceptorMockServerIT.Config.class})
+public class ResponseLoggingInterceptorMockServerIT {
 
     @SuppressWarnings("unused")
     @Autowired
