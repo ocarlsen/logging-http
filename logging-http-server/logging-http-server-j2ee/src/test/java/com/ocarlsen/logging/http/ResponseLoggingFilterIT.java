@@ -1,4 +1,4 @@
-package com.ocarlsen.logging;
+package com.ocarlsen.logging.http;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

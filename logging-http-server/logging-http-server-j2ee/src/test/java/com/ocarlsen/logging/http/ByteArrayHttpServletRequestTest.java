@@ -1,5 +1,7 @@
-package com.ocarlsen.logging;
+package com.ocarlsen.logging.http;
 
+import com.ocarlsen.logging.http.ByteArrayHttpServletRequest;
+import com.ocarlsen.logging.http.ByteArrayServletInputStream;
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;

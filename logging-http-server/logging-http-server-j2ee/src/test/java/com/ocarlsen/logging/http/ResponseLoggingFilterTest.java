@@ -1,5 +1,7 @@
-package com.ocarlsen.logging;
+package com.ocarlsen.logging.http;
 
+import com.ocarlsen.logging.http.CachingHttpServletResponse;
+import com.ocarlsen.logging.http.ResponseLoggingFilter;
 import org.junit.After;
 import org.junit.Test;
 import org.slf4j.Logger;

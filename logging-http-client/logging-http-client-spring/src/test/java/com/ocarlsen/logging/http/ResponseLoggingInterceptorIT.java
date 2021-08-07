@@ -1,7 +1,8 @@
-package com.ocarlsen.logging;
+package com.ocarlsen.logging.http;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +17,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Controller;
@@ -35,12 +36,13 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
@@ -50,10 +52,10 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = RequestLoggingInterceptorIT.Config.class)
-public class RequestLoggingInterceptorIT {
+@ContextConfiguration(classes = ResponseLoggingInterceptorIT.Config.class)
+public class ResponseLoggingInterceptorIT {
 
-    private static final String CONTROLLER_URI = "/request_logging_test";
+    private static final String CONTROLLER_URI = "/response_logging_test";
     private static final String BODY = "body";
     private static final String ID = "id";
 
@@ -95,9 +97,7 @@ public class RequestLoggingInterceptorIT {
         final String requestBody = "Hello!";
         final HttpMethod requestMethod = HttpMethod.POST;
 
-        // AbstractHttpMessageConverter #addDefaultHeaders will add Content-Type and Content-Length if we don't.
-        // Although the HttpURLConnection #isRestrictedHeader method will prevent Content-Length from being sent over the wire,
-        // this is client-side logging so add it to list of expected headers.
+        // See comment in RequestLoggingInterceptorIT.
         final HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAccept(singletonList(APPLICATION_JSON));
         requestHeaders.setContentType(TEXT_PLAIN);
@@ -124,13 +124,31 @@ public class RequestLoggingInterceptorIT {
             assertThat(actualHeaders, hasEntry(entry.getKey(), entry.getValue()));
         }
 
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
+        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         final InOrder inOrder = inOrder(mockLogger);
-        inOrder.verify(mockLogger).debug("Method  : {}", requestMethod);
-        inOrder.verify(mockLogger).debug("URI:    : {}", requestUri.toUri());
-        inOrder.verify(mockLogger).debug("Headers : {}", requestHeaders);
-        inOrder.verify(mockLogger).debug("Body    : [{}]", requestBody);
+        inOrder.verify(mockLogger).debug("Status  : {}", responseStatus);
+        inOrder.verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
+        inOrder.verify(mockLogger).debug("Body    : [{}]", responseBody);
         inOrder.verifyNoMoreInteractions();
+    }
+
+    private ArgumentMatcher<HttpHeaders> containsHeaders(final HttpHeaders headers) {
+        return argument -> {
+
+            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                final String headerName = entry.getKey();
+                if (argument.containsKey(headerName)) {
+                    final List<String> headerValues = argument.get(headerName);
+                    final boolean matches = entry.getValue().equals(headerValues);
+                    if (!matches) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        };
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -168,14 +186,12 @@ public class RequestLoggingInterceptorIT {
         public RestTemplate restTemplate() {
             final RestTemplate restTemplate = new RestTemplate();
 
-            // Make sure buffering enabled.
+            // Need buffering request factory for response logging.
             final ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
-            assertThat(requestFactory, is(instanceOf(SimpleClientHttpRequestFactory.class)));
-            final SimpleClientHttpRequestFactory simpleRequestFactory = (SimpleClientHttpRequestFactory) requestFactory;
-            simpleRequestFactory.setBufferRequestBody(true);    // Be explicit.
+            restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(requestFactory));
 
             // Add interceptor under test
-            restTemplate.getInterceptors().add(new RequestLoggingInterceptor());
+            restTemplate.getInterceptors().add(new ResponseLoggingInterceptor());
 
             // Disable annoying "Accept-Charset" header, interferes with test.
             for (final HttpMessageConverter<?> converter : restTemplate.getMessageConverters()) {

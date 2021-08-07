@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.ocarlsen.logging</groupId>
+        <groupId>com.ocarlsen.logging.http</groupId>
         <artifactId>logging-http-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../../logging-http-parent/pom.xml</relativePath>

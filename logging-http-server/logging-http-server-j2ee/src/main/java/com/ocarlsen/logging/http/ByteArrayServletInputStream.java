@@ -1,4 +1,4 @@
-package com.ocarlsen.logging;
+package com.ocarlsen.logging.http;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;

@@ -1,5 +1,8 @@
-package com.ocarlsen.logging;
+package com.ocarlsen.logging.http;
 
+import com.ocarlsen.logging.http.ByteArrayHttpServletRequest;
+import com.ocarlsen.logging.http.ByteArrayServletInputStream;
+import com.ocarlsen.logging.http.RequestLoggingFilter;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;

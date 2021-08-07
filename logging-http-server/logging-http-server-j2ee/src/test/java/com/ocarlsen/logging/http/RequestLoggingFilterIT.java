@@ -1,4 +1,4 @@
-package com.ocarlsen.logging;
+package com.ocarlsen.logging.http;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,8 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Controller;
@@ -35,7 +33,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.Map;
 
+import static com.ocarlsen.logging.LogLevel.DEBUG;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -52,10 +52,10 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = ResponseLoggingInterceptorIT.Config.class)
-public class ResponseLoggingInterceptorIT {
+@ContextConfiguration(classes = RequestLoggingFilterIT.Config.class)
+public class RequestLoggingFilterIT {
 
-    private static final String CONTROLLER_URI = "/response_logging_test";
+    private static final String CONTROLLER_URI = "/request_logging_test";
     private static final String BODY = "body";
     private static final String ID = "id";
 
@@ -66,6 +66,10 @@ public class ResponseLoggingInterceptorIT {
     @SuppressWarnings("unused")
     @Autowired
     private MyController myController;
+
+    @SuppressWarnings("unused")
+    @Autowired
+    private RequestLoggingFilter requestLoggingFilter;
 
     @SuppressWarnings("unused")
     @Autowired
@@ -86,8 +90,9 @@ public class ResponseLoggingInterceptorIT {
         assertNotNull(restTemplate);
     }
 
+    @SuppressWarnings("UnnecessaryToStringCall")
     @Test
-    public void intercept() {
+    public void loggingFilter() {
 
         final int requestId = 1234;
         final UriComponents requestUri = UriComponentsBuilder
@@ -97,11 +102,13 @@ public class ResponseLoggingInterceptorIT {
         final String requestBody = "Hello!";
         final HttpMethod requestMethod = HttpMethod.POST;
 
-        // See comment in RequestLoggingInterceptorIT.
+        // AbstractHttpMessageConverter #addDefaultHeaders will add Content-Type and Content-Length if we don't.
+        // However, the HttpURLConnection #isRestrictedHeader method will prevent Content-Length from being sent over the wire.
+        // Therefore, it will not make it to the server, and will not be logged.  Omit from list of headers to match.
         final HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAccept(singletonList(APPLICATION_JSON));
         requestHeaders.setContentType(TEXT_PLAIN);
-        requestHeaders.setContentLength(requestBody.length());
+        //requestHeaders.setContentLength(requestBody.length());
 
         final HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, requestHeaders);
         final ResponseEntity<String> responseEntity = restTemplate.exchange(requestUri.toUri(), requestMethod,
@@ -124,26 +131,25 @@ public class ResponseLoggingInterceptorIT {
             assertThat(actualHeaders, hasEntry(entry.getKey(), entry.getValue()));
         }
 
-        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
+        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         final InOrder inOrder = inOrder(mockLogger);
-        inOrder.verify(mockLogger).debug("Status  : {}", responseStatus);
-        inOrder.verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
-        inOrder.verify(mockLogger).debug("Body    : [{}]", responseBody);
+        inOrder.verify(mockLogger).debug("Starting {} (logLevel={})", "RequestLoggingFilter", DEBUG);
+        inOrder.verify(mockLogger).debug("Method  : {}", requestMethod.name());
+        inOrder.verify(mockLogger).debug("URL     : {}", requestUri.toUri().toString());
+        inOrder.verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(requestHeaders)));
+        inOrder.verify(mockLogger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();
     }
 
-    private ArgumentMatcher<HttpHeaders> containsHeaders(final HttpHeaders headers) {
+    // TODO: Factor out, this is duplicated.
+    private ArgumentMatcher<String> containsHeaders(final HttpHeaders headers) {
         return argument -> {
 
+            // Convert Map.Entry to string and search ignoring case.
             for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                final String headerName = entry.getKey();
-                if (argument.containsKey(headerName)) {
-                    final List<String> headerValues = argument.get(headerName);
-                    final boolean matches = entry.getValue().equals(headerValues);
-                    if (!matches) {
-                        return false;
-                    }
-                } else {
+                final String headerPair = entry.toString();
+                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
+                if (!matches) {
                     return false;
                 }
             }
@@ -152,7 +158,6 @@ public class ResponseLoggingInterceptorIT {
     }
 
     @SuppressWarnings("SameParameterValue")
-    // TODO: Factor out, this is duplicated
     private String createUrlWithPort(final String path) {
         return "http://localhost:" + serverPort + path;
     }
@@ -161,10 +166,7 @@ public class ResponseLoggingInterceptorIT {
     static class MyController {
 
         @SuppressWarnings("unused")
-        @PostMapping(
-                value = CONTROLLER_URI,
-                consumes = TEXT_PLAIN_VALUE,
-                produces = APPLICATION_JSON_VALUE)
+        @PostMapping(value = CONTROLLER_URI, consumes = TEXT_PLAIN_VALUE, produces = APPLICATION_JSON_VALUE)
         @ResponseBody  // Without this, we get 404
         public String echo(@RequestBody final String body,
                            @RequestParam(ID) final Integer id) {
@@ -178,20 +180,18 @@ public class ResponseLoggingInterceptorIT {
     static class Config {
 
         @Bean
-        public MyController myController() {
+        MyController myController() {
             return new MyController();
         }
 
         @Bean
-        public RestTemplate restTemplate() {
+        RequestLoggingFilter loggingFilter() {
+            return new RequestLoggingFilter();
+        }
+
+        @Bean
+        RestTemplate restTemplate() {
             final RestTemplate restTemplate = new RestTemplate();
-
-            // Need buffering request factory for response logging.
-            final ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
-            restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(requestFactory));
-
-            // Add interceptor under test
-            restTemplate.getInterceptors().add(new ResponseLoggingInterceptor());
 
             // Disable annoying "Accept-Charset" header, interferes with test.
             for (final HttpMessageConverter<?> converter : restTemplate.getMessageConverters()) {
@@ -202,5 +202,7 @@ public class ResponseLoggingInterceptorIT {
 
             return restTemplate;
         }
+
     }
+
 }
