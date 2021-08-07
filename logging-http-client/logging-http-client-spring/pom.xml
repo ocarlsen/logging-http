@@ -11,9 +11,9 @@
         <relativePath>../../logging-http-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>logging-http-interceptor</artifactId>
+    <artifactId>logging-http-client-spring</artifactId>
 
-    <name>Logging HTTP Interceptor</name>
+    <name>Logging HTTP Client Spring</name>
 
     <properties>
         <spring.version>5.0.5.RELEASE</spring.version>

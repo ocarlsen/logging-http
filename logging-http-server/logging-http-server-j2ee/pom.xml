@@ -9,9 +9,9 @@
         <relativePath>../../logging-http-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>logging-http-filter</artifactId>
+    <artifactId>logging-http-server-j2ee</artifactId>
 
-    <name>Logging HTTP Filter</name>
+    <name>Logging HTTP Server J2EE</name>
 
     <properties>
         <spring-boot.version>2.0.1.RELEASE</spring-boot.version><!-- Uses Spring 5.0.5.RELEASE -->

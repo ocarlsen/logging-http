@@ -17,6 +17,6 @@
     <name>Logging HTTP Server</name>
 
     <modules>
-        <module>logging-http-filter</module>
+        <module>logging-http-server-j2ee</module>
     </modules>
 </project>

@@ -8,16 +8,10 @@
         <groupId>com.ocarlsen.logging</groupId>
         <artifactId>logging-http-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../logging-http-parent/pom.xml</relativePath>
+        <relativePath>../../logging-http-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>logging-http-client</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>logging-http-client-apache</artifactId>
 
-    <name>Logging HTTP Client</name>
-
-    <modules>
-        <module>logging-http-client-apache</module>
-        <module>logging-http-client-spring</module>
-    </modules>
+    <name>Logging HTTP Client Apache</name>
 </project>
