@@ -33,7 +33,7 @@
         <dependency>
             <groupId>com.ocarlsen.logging</groupId>
             <artifactId>slf4j-log-level</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>1.2.0</version>
         </dependency>
 
         <!-- Provided -->
