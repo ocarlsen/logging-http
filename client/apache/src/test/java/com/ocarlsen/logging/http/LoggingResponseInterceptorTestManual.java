@@ -22,28 +22,29 @@ public class LoggingResponseInterceptorTestManual {
         final HttpResponseInterceptor responseInterceptor = new LoggingResponseInterceptor();
 
         //Creating a CloseableHttpClient object
-        final CloseableHttpClient httpclient = HttpClients.custom().addInterceptorFirst(responseInterceptor).build();
+        try (final CloseableHttpClient httpclient = HttpClients.custom().addInterceptorFirst(responseInterceptor).build()) {
 
-        //Creating a request object
-        final HttpGet httpGet = new HttpGet("https://www.tutorialspoint.com/");
+            //Creating a request object
+            final HttpGet httpGet = new HttpGet("https://www.tutorialspoint.com/");
 
-        //Executing the request
-        final HttpResponse response = httpclient.execute(httpGet);
+            //Executing the request
+            final HttpResponse response = httpclient.execute(httpGet);
 
-        System.out.println(response.getStatusLine());
+            System.out.println(response.getStatusLine());
 
-        HttpEntity entity = response.getEntity();
-        final Header contentEncodingHeader = entity.getContentEncoding();
-        if (contentEncodingHeader != null) {
-            final HeaderElement[] encodings = contentEncodingHeader.getElements();
-            for (final HeaderElement encoding : encodings) {
-                if (encoding.getName().equalsIgnoreCase("gzip")) {
-                    entity = new GzipDecompressingEntity(entity);
-                    break;
+            HttpEntity entity = response.getEntity();
+            final Header contentEncodingHeader = entity.getContentEncoding();
+            if (contentEncodingHeader != null) {
+                final HeaderElement[] encodings = contentEncodingHeader.getElements();
+                for (final HeaderElement encoding : encodings) {
+                    if (encoding.getName().equalsIgnoreCase("gzip")) {
+                        entity = new GzipDecompressingEntity(entity);
+                        break;
+                    }
                 }
             }
+            final String body = EntityUtils.toString(entity);
+            System.out.println("body = " + body);
         }
-        final String body = EntityUtils.toString(entity);
-        System.out.println("body = " + body);
     }
 }

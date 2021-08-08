@@ -18,5 +18,21 @@
 
     <modules>
         <module>javaee</module>
+        <module>jdk</module>
     </modules>
+
+    <dependencies>
+
+        <!-- Compile -->
+        <dependency>
+            <groupId>com.ocarlsen.logging</groupId>
+            <artifactId>slf4j-log-level</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
+    </dependencies>
 </project>

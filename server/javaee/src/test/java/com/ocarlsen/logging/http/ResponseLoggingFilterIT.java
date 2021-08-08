@@ -122,6 +122,7 @@ public class ResponseLoggingFilterIT {
         final HttpStatus actualStatus = responseEntity.getStatusCode();
         assertThat(actualStatus, is(responseStatus));
 
+        // Make sure response not consumed by filter.
         final String actualBody = responseEntity.getBody();
         assertThat(actualBody, is(responseBody));
 
