@@ -16,6 +16,25 @@
 
     <name>Logging HTTP Client</name>
 
+    <properties>
+        <apache.httpcore.version>4.4.13</apache.httpcore.version>
+        <apache.httpclient.version>4.5.13</apache.httpclient.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${apache.httpcore.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${apache.httpclient.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <modules>
         <module>apache</module>
         <module>spring</module>
