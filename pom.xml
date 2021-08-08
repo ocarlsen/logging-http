@@ -11,8 +11,8 @@
     <name>Logging HTTP</name>
 
     <modules>
-        <module>logging-http-parent</module>
-        <module>logging-http-client</module>
-        <module>logging-http-server</module>
+        <module>parent</module>
+        <module>client</module>
+        <module>server</module>
     </modules>
 </project>

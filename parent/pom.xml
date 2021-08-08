@@ -8,7 +8,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>logging-http-parent</artifactId>
+    <artifactId>parent</artifactId>
     <packaging>pom</packaging>
 
     <name>Logging HTTP Parent</name>

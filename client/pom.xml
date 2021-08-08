@@ -6,18 +6,18 @@
 
     <parent>
         <groupId>com.ocarlsen.logging.http</groupId>
-        <artifactId>logging-http-parent</artifactId>
+        <artifactId>parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../logging-http-parent/pom.xml</relativePath>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>logging-http-client</artifactId>
+    <artifactId>client</artifactId>
     <packaging>pom</packaging>
 
     <name>Logging HTTP Client</name>
 
     <modules>
-        <module>logging-http-client-apache</module>
-        <module>logging-http-client-spring</module>
+        <module>apache</module>
+        <module>spring</module>
     </modules>
 </project>

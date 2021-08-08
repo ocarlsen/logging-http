@@ -1,38 +1,62 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>com.ocarlsen.logging.http</groupId>
-        <artifactId>logging-http-parent</artifactId>
+        <artifactId>parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../../logging-http-parent/pom.xml</relativePath>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>logging-http-client-spring</artifactId>
+    <artifactId>server-javaee</artifactId>
 
-    <name>Logging HTTP Client Spring</name>
+    <name>Logging HTTP Server Java EE</name>
 
     <properties>
-        <spring.version>5.0.5.RELEASE</spring.version>
         <spring-boot.version>2.0.1.RELEASE</spring-boot.version><!-- Uses Spring 5.0.5.RELEASE -->
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
+
+        <!-- Compile -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.13</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ocarlsen.logging</groupId>
+            <artifactId>slf4j-log-level</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
+        <!-- Provided -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Test -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>4.4.0</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-lang3</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -43,6 +67,11 @@
                 <exclusion>
                     <groupId>ch.qos.logback</groupId>
                     <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <!-- Conflicts with mock-slf4j-impl -->
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -56,6 +85,11 @@
                 <exclusion>
                     <groupId>ch.qos.logback</groupId>
                     <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <!-- Conflicts with mock-slf4j-impl -->
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
                 </exclusion>
                 <!-- ByteBuddy version not JDK11-compatible. -->
                 <exclusion>

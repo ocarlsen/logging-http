@@ -6,12 +6,12 @@
 
     <parent>
         <groupId>com.ocarlsen.logging.http</groupId>
-        <artifactId>logging-http-parent</artifactId>
+        <artifactId>parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../../logging-http-parent/pom.xml</relativePath>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>logging-http-client-apache</artifactId>
+    <artifactId>client-apache</artifactId>
 
     <name>Logging HTTP Client Apache</name>
 
