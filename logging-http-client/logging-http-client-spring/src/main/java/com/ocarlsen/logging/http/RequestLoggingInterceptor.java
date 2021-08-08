@@ -18,13 +18,8 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
     public ClientHttpResponse intercept(final HttpRequest request, final byte[] body, final ClientHttpRequestExecution execution) throws IOException {
-
-        try {
-            logRequest(request, body);
-            return execution.execute(request, body);
-        } catch (final Exception e) {
-            throw new IOException(e);
-        }
+        logRequest(request, body);
+        return execution.execute(request, body);
     }
 
     private void logRequest(final HttpRequest request, final byte[] body) {
