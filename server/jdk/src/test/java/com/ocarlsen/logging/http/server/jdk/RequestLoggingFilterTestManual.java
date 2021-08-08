@@ -27,11 +27,13 @@ public class RequestLoggingFilterTestManual {
     @Test
     public void doFilter() throws IOException {
 
-        // TODO: Random port
-        final int port = 8000;
-        final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        final String path = "/applications/myapp";
+        // Random port
+        final HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
+        final String path = "/myapp";
         final HttpContext context = server.createContext(path, new MyHandler());
+
+        final InetSocketAddress address = server.getAddress();
+        final int port = address.getPort();
 
         context.getFilters().add(new RequestLoggingFilter());
 
