@@ -1,34 +1,38 @@
 package com.ocarlsen.logging.http.client.apache;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
-// TODO: Finish
+import static java.lang.invoke.MethodHandles.lookup;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class RequestLoggingInterceptor implements HttpRequestInterceptor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(lookup().lookupClass());
+
     @Override
-    public void process(final HttpRequest request, final HttpContext context) throws IOException {
+    public void process(final HttpRequest httpRequest, final HttpContext httpContext) throws IOException {
+        logRequest(httpRequest);
+    }
 
-        final String method = request.getRequestLine().getMethod();
-        System.out.println("method = " + method);
+    private void logRequest(final HttpRequest request) throws IOException {
+        LOGGER.debug("Method  : {}", request.getRequestLine().getMethod());
+        LOGGER.debug("URI:    : {}", request.getRequestLine().getUri());
 
-        final String uri = request.getRequestLine().getUri();
-        System.out.println("uri = " + uri);
-
-        final List<Header> headers = Arrays.asList(request.getAllHeaders());
-        System.out.println("headers = " + headers);
+        // TODO: Confirm standard header format is List
+        LOGGER.debug("Headers : {}", Arrays.asList(request.getAllHeaders()));
 
         final HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
-        final String body = EntityUtils.toString(entity);
-        System.out.println("body = " + body);
+        final String body = EntityUtils.toString(entity, UTF_8);
+        LOGGER.debug("Body    : [{}]", body);
     }
 }

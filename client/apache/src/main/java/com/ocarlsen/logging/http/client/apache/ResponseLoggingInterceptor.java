@@ -6,30 +6,35 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.client.entity.GzipDecompressingEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
-// TODO: Finish
+import static java.lang.invoke.MethodHandles.lookup;
+
 public class ResponseLoggingInterceptor implements HttpResponseInterceptor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(lookup().lookupClass());
+
     @Override
-    public void process(final HttpResponse response, final HttpContext context) throws IOException {
+    public void process(final HttpResponse httpResponse, final HttpContext httpContext) throws IOException {
+        logResponse(httpResponse);
+    }
 
-        final int statusCode = response.getStatusLine().getStatusCode();
-        System.out.println("statusCode = " + statusCode);
-
-        final List<Header> headers = Arrays.asList(response.getAllHeaders());
-        System.out.println("headers = " + headers);
+    // TODO: Response/Request logging formatter
+    private void logResponse(final HttpResponse response) throws IOException {
+        LOGGER.debug("Status  : {}", response.getStatusLine().getStatusCode());
+        LOGGER.debug("Headers : {}", Arrays.asList(response.getAllHeaders()));
 
         HttpEntity entity = response.getEntity();
 
         // Handle gzip encoding
+        // TODO: Generalize this to other clients
+        // TODO: Test this
         final Header contentEncodingHeader = entity.getContentEncoding();
         if (contentEncodingHeader != null) {
             final HeaderElement[] encodings = contentEncodingHeader.getElements();
@@ -40,12 +45,9 @@ public class ResponseLoggingInterceptor implements HttpResponseInterceptor {
                 }
             }
         }
-        final String body = EntityUtils.toString(entity);
-        System.out.println("body = " + body);
 
-        // Replace entity for downstream consumers.
-        final HttpEntity newEntity = new StringEntity(body, ContentType.get(entity));
-        response.setEntity(newEntity);
+        final String body = EntityUtils.toString(entity);
+        LOGGER.debug("Body    : [{}]", body);
     }
 
 }
