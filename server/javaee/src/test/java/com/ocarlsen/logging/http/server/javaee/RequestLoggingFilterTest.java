@@ -86,6 +86,7 @@ public class RequestLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(logger).debug("Method  : {}", method);
+        // TODO: Be consistent- URL or URI?
         verify(logger).debug("URL     : {}", requestUrl.toString());
         verify(logger).debug("Headers : {}", '[' + headerName + '=' + headerValues + ']');
         verify(logger).debug("Body    : [{}]", requestBody);

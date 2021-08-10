@@ -28,7 +28,8 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
         LOGGER.debug("Method  : {}", request.getRequestLine().getMethod());
         LOGGER.debug("URI:    : {}", request.getRequestLine().getUri());
 
-        // TODO: Confirm standard header format is List
+        // TODO: Confirm standard header format is List.
+        // TODO: Also make sure loggers all take Strings, not Headers objects or whatever.
         LOGGER.debug("Headers : {}", Arrays.asList(request.getAllHeaders()));
 
         final HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();

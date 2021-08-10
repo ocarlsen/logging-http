@@ -32,7 +32,7 @@ public class ResponseLoggingInterceptor implements HttpResponseInterceptor {
 
         HttpEntity entity = response.getEntity();
 
-        // Handle gzip encoding
+        // Handle content encoding
         // TODO: Generalize this to other clients
         // TODO: Test this
         final Header contentEncodingHeader = entity.getContentEncoding();
