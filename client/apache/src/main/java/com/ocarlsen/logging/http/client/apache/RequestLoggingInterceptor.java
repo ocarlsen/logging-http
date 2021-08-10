@@ -26,7 +26,7 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
 
     private void logRequest(final HttpRequest request) throws IOException {
         LOGGER.debug("Method  : {}", request.getRequestLine().getMethod());
-        LOGGER.debug("URI:    : {}", request.getRequestLine().getUri());
+        LOGGER.debug("URL:    : {}", request.getRequestLine().getUri());
 
         // TODO: Confirm standard header format is List.
         // TODO: Also make sure loggers all take Strings, not Headers objects or whatever.

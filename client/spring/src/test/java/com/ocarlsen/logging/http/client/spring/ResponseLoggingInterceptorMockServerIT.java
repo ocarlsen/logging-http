@@ -59,7 +59,7 @@ public class ResponseLoggingInterceptorMockServerIT {
     @Test
     public void intercept() {
 
-        final UriComponents requestUri = UriComponentsBuilder.fromUriString("/logging_test").build();
+        final UriComponents requestUri = UriComponentsBuilder.fromUriString("/logging_test?abc=def").build();
         final String requestBody = "Hello!";
         final HttpMethod requestMethod = HttpMethod.GET;
 

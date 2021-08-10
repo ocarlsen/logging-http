@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -44,7 +46,7 @@ public class RequestLoggingFilterIT {
     public static final String PATH = "/testapp";
 
     @Test
-    public void doFilter_get() throws IOException {
+    public void doFilter_get() throws IOException, URISyntaxException {
 
         // TODO: Move server logic to BeforeClass, AfterClass
         // Random port
@@ -94,14 +96,14 @@ public class RequestLoggingFilterIT {
         // Verify
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(mockLogger).debug("Method  : {}", httpGet.getMethod());
-        verify(mockLogger).debug("URL     : {}", uri);
+        verify(mockLogger).debug("URL     : {}", new URI(uri));
         verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(mockLogger).debug("Body    : [{}]", "");
         reset(mockLogger);
     }
 
     @Test
-    public void doFilter_post_gzip() throws IOException {
+    public void doFilter_post_gzip() throws IOException, URISyntaxException {
 
         // Random port
         final HttpServer httpServer = HttpServer.create(new InetSocketAddress(0), 0);
@@ -159,7 +161,7 @@ public class RequestLoggingFilterIT {
         // Verify
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(mockLogger).debug("Method  : {}", httpPost.getMethod());
-        verify(mockLogger).debug("URL     : {}", uri);
+        verify(mockLogger).debug("URL     : {}", new URI(uri));
         verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(mockLogger).debug("Body    : [{}]", requestBodyText);
         reset(mockLogger);

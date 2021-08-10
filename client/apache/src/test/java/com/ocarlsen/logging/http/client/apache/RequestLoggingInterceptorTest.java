@@ -61,7 +61,7 @@ public class RequestLoggingInterceptorTest {
         // Then
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(mockLogger).debug("Method  : {}", method);
-        verify(mockLogger).debug("URI:    : {}", uri);
+        verify(mockLogger).debug("URL:    : {}", uri);
         verify(mockLogger).debug("Headers : {}", List.of(header1, header2));
         verify(mockLogger).debug("Body    : [{}]", body);
         verifyNoMoreInteractions(mockLogger);

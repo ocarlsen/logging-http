@@ -56,7 +56,7 @@ public class RequestLoggingInterceptorTest {
         assertThat(actualResponse, is(sameInstance(response)));
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(mockLogger).debug("Method  : {}", method);
-        verify(mockLogger).debug("URI:    : {}", uri);
+        verify(mockLogger).debug("URL:    : {}", uri);
         verify(mockLogger).debug("Headers : {}", headers);
         verify(mockLogger).debug("Body    : [{}]", bodyText);
         verifyNoMoreInteractions(mockLogger);
@@ -100,7 +100,7 @@ public class RequestLoggingInterceptorTest {
         // Then
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(mockLogger).debug("Method  : {}", method);
-        verify(mockLogger).debug("URI:    : {}", uri);
+        verify(mockLogger).debug("URL:    : {}", uri);
         verify(mockLogger).debug("Headers : {}", headers);
         verify(mockLogger).debug("Body    : [{}]", bodyText);
         reset(mockLogger);

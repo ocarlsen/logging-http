@@ -49,7 +49,7 @@ public class RequestLoggingFilter extends Filter {
 
         logLevel.log(LOGGER, "Method  : {}", exchange.getRequestMethod());
         final URI requestURI = buildUri(exchange);
-        logLevel.log(LOGGER, "URL     : {}", requestURI.toString());
+        logLevel.log(LOGGER, "URL     : {}", requestURI);
         logLevel.log(LOGGER, "Headers : {}", exchange.getRequestHeaders());
         final String bodyText = IOUtils.toString(requestBody, UTF_8);
         logLevel.log(LOGGER, "Body    : [{}]", bodyText);
@@ -61,6 +61,7 @@ public class RequestLoggingFilter extends Filter {
         chain.doFilter(exchange);
     }
 
+    // TODO: Test
     @Override
     public String description() {
         return this.getClass().getSimpleName();
@@ -87,7 +88,7 @@ public class RequestLoggingFilter extends Filter {
             final String hostName = addr.getHostName();
             final int port = addr.getPort();
             return new URI(scheme, null, hostName, port, path, queryParams, null);
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

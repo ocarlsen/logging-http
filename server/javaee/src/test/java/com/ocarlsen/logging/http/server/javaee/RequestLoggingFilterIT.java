@@ -135,7 +135,7 @@ public class RequestLoggingFilterIT {
         final InOrder inOrder = inOrder(mockLogger);
         inOrder.verify(mockLogger).debug("Starting {} (logLevel={})", "RequestLoggingFilter", DEBUG);
         inOrder.verify(mockLogger).debug("Method  : {}", requestMethod.name());
-        inOrder.verify(mockLogger).debug("URL     : {}", requestUri.toUri().toString());
+        inOrder.verify(mockLogger).debug("URL     : {}", requestUri.toString());
         inOrder.verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(requestHeaders)));
         inOrder.verify(mockLogger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();

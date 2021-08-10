@@ -58,7 +58,7 @@ public class RequestLoggingInterceptorMockServerIT {
     @Test
     public void intercept() {
 
-        final UriComponents requestUri = UriComponentsBuilder.fromUriString("/logging_test").build();
+        final UriComponents requestUri = UriComponentsBuilder.fromUriString("/logging_test?abc=def").build();
         final String requestBody = "Hello!";
         final HttpMethod requestMethod = HttpMethod.GET;
 
@@ -100,7 +100,7 @@ public class RequestLoggingInterceptorMockServerIT {
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         final InOrder inOrder = inOrder(mockLogger);
         inOrder.verify(mockLogger).debug("Method  : {}", requestMethod);
-        inOrder.verify(mockLogger).debug("URI:    : {}", requestUri.toUri());
+        inOrder.verify(mockLogger).debug("URL:    : {}", requestUri.toUri());
         inOrder.verify(mockLogger).debug("Headers : {}", requestHeaders);
         inOrder.verify(mockLogger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();

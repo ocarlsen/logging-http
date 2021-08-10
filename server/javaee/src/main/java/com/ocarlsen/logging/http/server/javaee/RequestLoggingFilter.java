@@ -79,10 +79,4 @@ public class RequestLoggingFilter implements Filter {
         return Collections.list(headerValues).toString();
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private static boolean isEnabled(final String property) {
-        final String value = System.getProperty(property, "true");
-        return Boolean.parseBoolean(value);
-    }
-
 }
