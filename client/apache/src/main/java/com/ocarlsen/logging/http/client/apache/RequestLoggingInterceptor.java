@@ -1,9 +1,15 @@
 package com.ocarlsen.logging.http.client.apache;
 
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.entity.GzipCompressingEntity;
+import org.apache.http.client.entity.GzipDecompressingEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -32,8 +38,44 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
         // TODO: Also make sure loggers all take Strings, not Headers objects or whatever.
         LOGGER.debug("Headers : {}", Arrays.asList(request.getAllHeaders()));
 
-        final HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
-        final String body = EntityUtils.toString(entity, UTF_8);
+        final String body;
+        if (request instanceof HttpEntityEnclosingRequest) {
+            HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
+
+            // TODO: Generalize this, replicate for other clients
+            // TODO: Test
+            // Handle content encoding
+            final Header contentEncodingHeader = entity.getContentEncoding();
+            if (contentEncodingHeader != null) {
+                final HeaderElement[] encodings = contentEncodingHeader.getElements();
+                for (final HeaderElement encoding : encodings) {
+                    if (encoding.getName().equalsIgnoreCase("gzip")) {
+
+                        // In case of GzipCompressingEntity, need to wrap so GzipDecompressingEntity can read content.
+                        if (entity instanceof GzipCompressingEntity) {
+                            entity = new GzipContentEnablingEntity((GzipCompressingEntity) entity);
+                        }
+
+                        entity = new GzipDecompressingEntity(entity);
+                        break;
+                    }
+                }
+            }
+
+            body = EntityUtils.toString(entity, UTF_8);
+
+            // If entity has been consumed, we need to restore.
+            if (!entity.isRepeatable()) {
+                final HttpEntity repeatableEntity = EntityBuilder.create()
+                                                                 .setText(body)
+                                                                 // TODO: restore GZIP
+                                                                 .build();
+                ((HttpEntityEnclosingRequest) request).setEntity(repeatableEntity);
+            }
+        } else {
+            body = "";
+        }
         LOGGER.debug("Body    : [{}]", body);
     }
+
 }

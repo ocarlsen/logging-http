@@ -10,10 +10,10 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
@@ -127,13 +127,14 @@ public class RequestLoggingFilterIT {
         final Header[] headers = {header};
         httpPost.setHeaders(headers);
         final String requestBodyText = "hello";
-        final byte[] requestBodyBytes = requestBodyText.getBytes(UTF_8);
 
         try (final CloseableHttpClient httpclient = HttpClients.createDefault()) {
 
 
             // GZip request
-            final HttpEntity requestEntity = new ByteArrayEntity(requestBodyBytes);
+            final HttpEntity requestEntity = EntityBuilder.create()
+                                                          .setText(requestBodyText)
+                                                          .build();
             final GzipCompressingEntity gzipCompressingEntity = new GzipCompressingEntity(requestEntity);
             httpPost.setEntity(gzipCompressingEntity);
             final Header contentEncoding = new BasicHeader(CONTENT_ENCODING, "gzip");

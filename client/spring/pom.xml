@@ -15,7 +15,6 @@
     <name>Logging HTTP Client Spring</name>
 
     <properties>
-        <spring.version>5.0.5.RELEASE</spring.version>
         <spring-boot.version>2.0.1.RELEASE</spring-boot.version><!-- Uses Spring 5.0.5.RELEASE -->
     </properties>
 

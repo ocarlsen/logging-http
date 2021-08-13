@@ -16,6 +16,10 @@
 
     <name>Logging HTTP Client</name>
 
+    <properties>
+        <spring.version>5.0.5.RELEASE</spring.version>
+    </properties>
+
     <modules>
         <module>apache</module>
         <module>spring</module>

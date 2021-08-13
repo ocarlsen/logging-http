@@ -5,6 +5,8 @@ import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -32,14 +34,19 @@ public class ResponseLoggingInterceptor implements HttpResponseInterceptor {
 
         HttpEntity entity = response.getEntity();
 
+        // TODO: Generalize this, replicate for other clients
         // Handle content encoding
-        // TODO: Generalize this to other clients
-        // TODO: Test this
         final Header contentEncodingHeader = entity.getContentEncoding();
         if (contentEncodingHeader != null) {
             final HeaderElement[] encodings = contentEncodingHeader.getElements();
             for (final HeaderElement encoding : encodings) {
                 if (encoding.getName().equalsIgnoreCase("gzip")) {
+
+                    // In case of GzipCompressingEntity, need to wrap so GzipDecompressingEntity can read content.
+                    if (entity instanceof GzipCompressingEntity) {
+                        entity = new GzipContentEnablingEntity((GzipCompressingEntity) entity);
+                    }
+
                     entity = new GzipDecompressingEntity(entity);
                     break;
                 }
@@ -48,6 +55,16 @@ public class ResponseLoggingInterceptor implements HttpResponseInterceptor {
 
         final String body = EntityUtils.toString(entity);
         LOGGER.debug("Body    : [{}]", body);
+
+        // If entity has been consumed, we need to restore.
+        if (!entity.isRepeatable()) {
+            final HttpEntity repeatableEntity = EntityBuilder.create()
+                                                             .setText(body)
+                                                             // TODO: restore GZIP
+                                                             .build();
+            response.setEntity(repeatableEntity);
+        }
     }
+
 
 }
