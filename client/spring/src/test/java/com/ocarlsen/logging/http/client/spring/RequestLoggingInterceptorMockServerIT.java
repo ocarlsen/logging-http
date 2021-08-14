@@ -33,6 +33,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -58,9 +59,10 @@ public class RequestLoggingInterceptorMockServerIT {
     @Test
     public void intercept() {
 
+        // Given
         final UriComponents requestUri = UriComponentsBuilder.fromUriString("/logging_test?abc=def").build();
         final String requestBody = "Hello!";
-        final HttpMethod requestMethod = HttpMethod.GET;
+        final HttpMethod requestMethod = HttpMethod.POST;
 
         // AbstractHttpMessageConverter#addDefaultHeaders will add Content-Type and Content-Length if we don't.
         final HttpHeaders requestHeaders = new HttpHeaders();
@@ -75,27 +77,34 @@ public class RequestLoggingInterceptorMockServerIT {
         responseHeaders.setContentType(APPLICATION_JSON);
         responseHeaders.setContentLength(responseBody.length());
 
+        // Prepare mock
         mockServer.expect(requestTo(requestUri.toUriString()))
                   .andExpect(header(ACCEPT, APPLICATION_JSON_VALUE))
                   .andExpect(header(CONTENT_TYPE, TEXT_PLAIN_VALUE))
                   .andExpect(header(CONTENT_LENGTH, Integer.toString(requestBody.length())))
                   .andExpect(method(requestMethod))
+                  .andExpect(content().string(requestBody))
                   .andRespond(withStatus(responseStatus).headers(responseHeaders).body(responseBody));
 
+        // When
         final HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, requestHeaders);
         final ResponseEntity<String> responseEntity = restTemplate.exchange(requestUri.toUri(), requestMethod,
                 requestEntity, String.class);
 
+        // Then
         final HttpStatus actualStatus = responseEntity.getStatusCode();
         assertThat(actualStatus, is(responseStatus));
 
-        final String actualBody = responseEntity.getBody();
-        assertThat(actualBody, is(responseBody));
+        // Make sure request not consumed by interceptor.
+        final String actualRequestBody = requestEntity.getBody();
+        assertThat(actualRequestBody, is(requestBody));
+
+        // Make sure response not consumed by interceptor.
+        final String actualResponseBody = responseEntity.getBody();
+        assertThat(actualResponseBody, is(responseBody));
 
         final HttpHeaders actualHeaders = responseEntity.getHeaders();
         assertThat(actualHeaders, is(responseHeaders));
-
-        mockServer.verify();
 
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         final InOrder inOrder = inOrder(mockLogger);
@@ -104,6 +113,9 @@ public class RequestLoggingInterceptorMockServerIT {
         inOrder.verify(mockLogger).debug("Headers : {}", requestHeaders);
         inOrder.verify(mockLogger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();
+
+        // Verify mock
+        mockServer.verify();
     }
 
     @SuppressWarnings("unused")

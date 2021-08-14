@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -63,7 +62,7 @@ public class RequestLoggingInterceptorSpringBootIT {
 
     @SuppressWarnings("unused")
     @Autowired
-    private MyController myController;
+    private EchoController echoController;
 
     @SuppressWarnings("unused")
     @Autowired
@@ -71,7 +70,7 @@ public class RequestLoggingInterceptorSpringBootIT {
 
     @Test
     public void contextLoads() {
-        assertNotNull(myController);
+        assertNotNull(echoController);
     }
 
     @Test
@@ -108,7 +107,7 @@ public class RequestLoggingInterceptorSpringBootIT {
                 requestEntity, String.class);
 
         final HttpStatus responseStatus = HttpStatus.OK;
-        final String responseBody = myController.echo(requestBody, requestId);
+        final String responseBody = echoController.echo(requestBody, requestId);
         final HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setContentType(APPLICATION_JSON_UTF8);
         responseHeaders.setContentLength(responseBody.length());
@@ -116,8 +115,13 @@ public class RequestLoggingInterceptorSpringBootIT {
         final HttpStatus actualStatus = responseEntity.getStatusCode();
         assertThat(actualStatus, is(responseStatus));
 
-        final String actualBody = responseEntity.getBody();
-        assertThat(actualBody, is(responseBody));
+        // Make sure request not consumed by interceptor.
+        final String actualRequestBody = requestEntity.getBody();
+        assertThat(actualRequestBody, is(requestBody));
+
+        // Make sure response not consumed by interceptor.
+        final String actualResponseBody = responseEntity.getBody();
+        assertThat(actualResponseBody, is(responseBody));
 
         final HttpHeaders actualHeaders = responseEntity.getHeaders();
         for (final Map.Entry<String, List<String>> entry : responseHeaders.entrySet()) {
@@ -140,7 +144,7 @@ public class RequestLoggingInterceptorSpringBootIT {
     }
 
     @Controller
-    static class MyController {
+    static class EchoController {
 
         @SuppressWarnings("unused")
         @PostMapping(
@@ -160,8 +164,8 @@ public class RequestLoggingInterceptorSpringBootIT {
     static class Config {
 
         @Bean
-        public MyController myController() {
-            return new MyController();
+        public EchoController myController() {
+            return new EchoController();
         }
 
         @Bean
@@ -170,7 +174,6 @@ public class RequestLoggingInterceptorSpringBootIT {
 
             // Make sure buffering enabled.
             final ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
-            assertThat(requestFactory, is(instanceOf(SimpleClientHttpRequestFactory.class)));
             final SimpleClientHttpRequestFactory simpleRequestFactory = (SimpleClientHttpRequestFactory) requestFactory;
             simpleRequestFactory.setBufferRequestBody(true);    // Be explicit.
 

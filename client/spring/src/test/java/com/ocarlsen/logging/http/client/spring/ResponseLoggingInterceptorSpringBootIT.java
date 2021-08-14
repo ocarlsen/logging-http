@@ -65,7 +65,7 @@ public class ResponseLoggingInterceptorSpringBootIT {
 
     @SuppressWarnings("unused")
     @Autowired
-    private MyController myController;
+    private EchoController echoController;
 
     @SuppressWarnings("unused")
     @Autowired
@@ -73,7 +73,7 @@ public class ResponseLoggingInterceptorSpringBootIT {
 
     @Test
     public void contextLoads() {
-        assertNotNull(myController);
+        assertNotNull(echoController);
     }
 
     @Test
@@ -97,7 +97,9 @@ public class ResponseLoggingInterceptorSpringBootIT {
         final String requestBody = "Hello!";
         final HttpMethod requestMethod = HttpMethod.POST;
 
-        // See comment in RequestLoggingInterceptorIT.
+        // AbstractHttpMessageConverter #addDefaultHeaders will add Content-Type and Content-Length if we don't.
+        // Although the HttpURLConnection #isRestrictedHeader method will prevent Content-Length from being sent over the wire,
+        // this is client-side logging so add it to list of expected headers.
         final HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAccept(singletonList(APPLICATION_JSON));
         requestHeaders.setContentType(TEXT_PLAIN);
@@ -108,7 +110,7 @@ public class ResponseLoggingInterceptorSpringBootIT {
                 requestEntity, String.class);
 
         final HttpStatus responseStatus = HttpStatus.OK;
-        final String responseBody = myController.echo(requestBody, requestId);
+        final String responseBody = echoController.echo(requestBody, requestId);
         final HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setContentType(APPLICATION_JSON_UTF8);
         responseHeaders.setContentLength(responseBody.length());
@@ -116,9 +118,13 @@ public class ResponseLoggingInterceptorSpringBootIT {
         final HttpStatus actualStatus = responseEntity.getStatusCode();
         assertThat(actualStatus, is(responseStatus));
 
-        // Make sure response not consumed by filter.
-        final String actualBody = responseEntity.getBody();
-        assertThat(actualBody, is(responseBody));
+        // Make sure request not consumed by interceptor.
+        final String actualRequestBody = requestEntity.getBody();
+        assertThat(actualRequestBody, is(requestBody));
+
+        // Make sure response not consumed by interceptor.
+        final String actualResponseBody = responseEntity.getBody();
+        assertThat(actualResponseBody, is(responseBody));
 
         final HttpHeaders actualHeaders = responseEntity.getHeaders();
         for (final Map.Entry<String, List<String>> entry : responseHeaders.entrySet()) {
@@ -159,7 +165,7 @@ public class ResponseLoggingInterceptorSpringBootIT {
     }
 
     @Controller
-    static class MyController {
+    static class EchoController {
 
         @SuppressWarnings("unused")
         @PostMapping(
@@ -179,8 +185,8 @@ public class ResponseLoggingInterceptorSpringBootIT {
     static class Config {
 
         @Bean
-        public MyController myController() {
-            return new MyController();
+        public EchoController myController() {
+            return new EchoController();
         }
 
         @Bean
