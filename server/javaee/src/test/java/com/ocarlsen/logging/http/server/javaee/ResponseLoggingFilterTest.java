@@ -1,7 +1,5 @@
 package com.ocarlsen.logging.http.server.javaee;
 
-import com.ocarlsen.logging.http.server.javaee.CachingHttpServletResponse;
-import com.ocarlsen.logging.http.server.javaee.ResponseLoggingFilter;
 import org.junit.After;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -76,7 +74,7 @@ public class ResponseLoggingFilterTest {
         when(response.getStatus()).thenReturn(responseStatus);
 
         final String headerName = "accept";
-        final Collection<String> headerNames = List.of(headerName);
+        final List<String> headerNames = List.of(headerName);
         when(response.getHeaderNames()).thenReturn(headerNames);
 
         final Collection<String> headerValues = List.of(TEXT_PLAIN_VALUE, APPLICATION_JSON_VALUE);
@@ -88,7 +86,7 @@ public class ResponseLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
         verify(logger).debug("Status  : {}", responseStatus);
-        verify(logger).debug("Headers : {}", '[' + headerName + '=' + headerValues + ']');
+        verify(logger).debug("Headers : {}", '{' + headerName + '=' + headerValues + '}');
         verify(logger).debug("Body    : [{}]", responseBody);
 
         // Verify mocks
@@ -135,7 +133,7 @@ public class ResponseLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
         verify(logger).info("Status  : {}", responseStatus);
-        verify(logger).info("Headers : {}", '[' + headerName + '=' + headerValues + ']');
+        verify(logger).info("Headers : {}", '{' + headerName + '=' + headerValues + '}');
         verify(logger).info("Body    : [{}]", responseBody);
 
         // Verify mocks
@@ -181,7 +179,7 @@ public class ResponseLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
         verify(logger).debug("Status  : {}", responseStatus);
-        verify(logger).debug("Headers : {}", '[' + headerName + '=' + headerValues + ']');
+        verify(logger).debug("Headers : {}", '{' + headerName + '=' + headerValues + '}');
         verify(logger).debug("Body    : [{}]", responseBody + '\n');
 
         // Verify mocks
@@ -221,7 +219,7 @@ public class ResponseLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
         verify(logger).debug("Status  : {}", responseStatus);
-        verify(logger).debug("Headers : {}", '[' + headerName + '=' + headerValues + ']');
+        verify(logger).debug("Headers : {}", '{' + headerName + '=' + headerValues + '}');
         verify(logger).debug("Body    : [{}]", "");
 
         // Verify mocks

@@ -84,7 +84,7 @@ public class RequestLoggingFilterTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(logger).debug("Method  : {}", method);
         verify(logger).debug("URL     : {}", requestUrl.toString());
-        verify(logger).debug("Headers : {}", '[' + headerName + '=' + headerValues + ']');
+        verify(logger).debug("Headers : {}", '{' + headerName + '=' + headerValues + '}');
         verify(logger).debug("Body    : [{}]", requestBody);
 
         // Verify mocks
@@ -132,7 +132,7 @@ public class RequestLoggingFilterTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(logger).info("Method  : {}", method);
         verify(logger).info("URL     : {}", requestUrl.toString());
-        verify(logger).info("Headers : {}", '[' + headerName + '=' + headerValues + ']');
+        verify(logger).info("Headers : {}", '{' + headerName + '=' + headerValues + '}');
         verify(logger).info("Body    : [{}]", requestBody);
 
         // Verify mocks

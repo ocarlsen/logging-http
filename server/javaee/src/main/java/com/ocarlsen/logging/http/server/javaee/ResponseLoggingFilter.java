@@ -12,8 +12,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static java.lang.invoke.MethodHandles.lookup;
@@ -34,8 +34,12 @@ public class ResponseLoggingFilter implements Filter {
         chain.doFilter(servletRequest, response);
 
         logLevel.log(LOGGER, "Status  : {}", response.getStatus());
-        logLevel.log(LOGGER, "Headers : {}", getHeaders(response));
-        logLevel.log(LOGGER, "Body    : [{}]", new String(((CachingHttpServletResponse) response).getCachedContent()));
+
+        final String headersFormatted = formatHeaders(response);
+        logLevel.log(LOGGER, "Headers : {}", headersFormatted);
+
+        final String body = new String(((CachingHttpServletResponse) response).getCachedContent());
+        logLevel.log(LOGGER, "Body    : [{}]", body);
     }
 
     @Override
@@ -56,24 +60,18 @@ public class ResponseLoggingFilter implements Filter {
         this.logLevel = logLevel;
     }
 
-    private String getHeaders(final HttpServletResponse response) {
-        final List<String> headers = new ArrayList<>();
+    private String formatHeaders(final HttpServletResponse response) {
+        final LinkedHashMap<String, List<String>> headers = new LinkedHashMap<>();
         final Collection<String> headerNames = response.getHeaderNames();
         if (headerNames != null) {
-            headerNames.forEach(h -> headers.add(h + "=" + getHeaderValues(response, h)));
+            headerNames.forEach(h -> headers.put(h, getHeaderValues(response, h)));
         }
         return headers.toString();
     }
 
-    private String getHeaderValues(final HttpServletResponse response, final String headerName) {
+    private List<String> getHeaderValues(final HttpServletResponse response, final String headerName) {
         final Collection<String> headerValues = response.getHeaders(headerName);
-        return List.copyOf(headerValues).toString();
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private static boolean isEnabled(final String property) {
-        final String value = System.getProperty(property, "true");
-        return Boolean.parseBoolean(value);
+        return List.copyOf(headerValues);
     }
 
 }
