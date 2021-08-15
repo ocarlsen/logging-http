@@ -1,5 +1,6 @@
 package com.ocarlsen.logging.http.server.jdk;
 
+import com.ocarlsen.logging.http.client.apache.GzipContentEnablingEntity;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
@@ -12,6 +13,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.entity.GzipCompressingEntity;
+import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -32,7 +34,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -82,6 +83,7 @@ public class RequestLoggingFilterIT {
             final StatusLine statusLine = response.getStatusLine();
             assertThat(statusLine.getStatusCode(), is(200));
 
+            // Make sure response not consumed by filter.
             final HttpEntity entity = response.getEntity();
             final String entityText = EntityUtils.toString(entity);
             assertThat(entityText, is(responseBodyText));
@@ -134,11 +136,9 @@ public class RequestLoggingFilterIT {
             // GZip request
             final HttpEntity requestEntity = EntityBuilder.create()
                                                           .setText(requestBodyText)
+                                                          .gzipCompress() // Automatically sets content encoding header
                                                           .build();
-            final GzipCompressingEntity gzipCompressingEntity = new GzipCompressingEntity(requestEntity);
-            httpPost.setEntity(gzipCompressingEntity);
-            final Header contentEncoding = new BasicHeader(CONTENT_ENCODING, "gzip");
-            httpPost.addHeader(contentEncoding);
+            httpPost.setEntity(requestEntity);
 
             // When
             final HttpResponse response = httpclient.execute(httpPost);
@@ -149,9 +149,17 @@ public class RequestLoggingFilterIT {
             final StatusLine statusLine = response.getStatusLine();
             assertThat(statusLine.getStatusCode(), is(200));
 
-            final HttpEntity entity = response.getEntity();
-            final String entityText = EntityUtils.toString(entity);
-            assertThat(entityText, is(responseBodyText));
+            // Make sure request not consumed by filter.
+            HttpEntity entityOut = new GzipDecompressingEntity(
+                    new GzipContentEnablingEntity(
+                            (GzipCompressingEntity) requestEntity));
+            final String actualRequestBody = EntityUtils.toString(entityOut);
+            assertThat(actualRequestBody, is(requestBodyText));
+
+            // Make sure response not consumed by filter.
+            final HttpEntity responseEntity = response.getEntity();
+            final String actualResponseText = EntityUtils.toString(responseEntity);
+            assertThat(actualResponseText, is(responseBodyText));
 
             // TODO: Asserts
             final Header[] responseHeaders = response.getAllHeaders();
@@ -167,6 +175,8 @@ public class RequestLoggingFilterIT {
         verify(mockLogger).debug("Body    : [{}]", requestBodyText);
         reset(mockLogger);
     }
+
+    // TODO: doFilter_post_gzip
 
     // TODO: Factor out, this is duplicated.
     private ArgumentMatcher<Headers> containsHeaders(final Header[] headers) {

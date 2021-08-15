@@ -13,6 +13,7 @@ import java.io.InputStream;
  * This class allows another {@link HttpEntity} to read content from a {@link GzipCompressingEntity},
  * whose {@link GzipCompressingEntity#getContent()} method throws {@link UnsupportedOperationException}.
  */
+// TODO: Factor out to util module b/c jdk also uses it
 public class GzipContentEnablingEntity extends HttpEntityWrapper {
 
     public GzipContentEnablingEntity(final GzipCompressingEntity gzipCompressingEntity) {

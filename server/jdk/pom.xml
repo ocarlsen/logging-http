@@ -23,6 +23,15 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>com.ocarlsen.logging.http</groupId>
+            <artifactId>client-apache</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
