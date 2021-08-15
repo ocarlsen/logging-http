@@ -1,4 +1,4 @@
-package com.ocarlsen.logging.http.client.apache;
+package com.ocarlsen.logging.http;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.entity.EntityBuilder;
@@ -11,7 +11,7 @@ import java.io.InputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class GzipContentEnablingEntityTest {
 

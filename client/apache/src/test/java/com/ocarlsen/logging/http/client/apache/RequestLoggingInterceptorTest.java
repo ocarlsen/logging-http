@@ -1,5 +1,6 @@
 package com.ocarlsen.logging.http.client.apache;
 
+import com.ocarlsen.logging.http.GzipContentEnablingEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;

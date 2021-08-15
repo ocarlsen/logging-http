@@ -27,7 +27,7 @@
         <!-- Test -->
         <dependency>
             <groupId>com.ocarlsen.logging.http</groupId>
-            <artifactId>client-apache</artifactId>
+            <artifactId>util</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

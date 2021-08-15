@@ -1,6 +1,6 @@
 package com.ocarlsen.logging.http.server.jdk;
 
-import com.ocarlsen.logging.http.client.apache.GzipContentEnablingEntity;
+import com.ocarlsen.logging.http.GzipContentEnablingEntity;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
@@ -150,7 +150,7 @@ public class RequestLoggingFilterIT {
             assertThat(statusLine.getStatusCode(), is(200));
 
             // Make sure request not consumed by filter.
-            HttpEntity entityOut = new GzipDecompressingEntity(
+            final HttpEntity entityOut = new GzipDecompressingEntity(
                     new GzipContentEnablingEntity(
                             (GzipCompressingEntity) requestEntity));
             final String actualRequestBody = EntityUtils.toString(entityOut);

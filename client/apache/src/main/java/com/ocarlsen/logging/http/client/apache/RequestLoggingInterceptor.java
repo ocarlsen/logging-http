@@ -1,5 +1,6 @@
 package com.ocarlsen.logging.http.client.apache;
 
+import com.ocarlsen.logging.http.GzipContentEnablingEntity;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
@@ -9,7 +10,6 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.entity.GzipDecompressingEntity;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
