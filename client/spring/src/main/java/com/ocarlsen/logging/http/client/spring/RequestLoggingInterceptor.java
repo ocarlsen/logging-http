@@ -2,6 +2,7 @@ package com.ocarlsen.logging.http.client.spring;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -25,7 +26,12 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
     private void logRequest(final HttpRequest request, final byte[] body) {
         LOGGER.debug("Method  : {}", request.getMethod());
         LOGGER.debug("URL:    : {}", request.getURI());
-        LOGGER.debug("Headers : {}", request.getHeaders());
+        final String headerFormatted = formatHeaders(request);
+        LOGGER.debug("Headers : {}", headerFormatted);
         LOGGER.debug("Body    : [{}]", new String(body, UTF_8));
+    }
+
+    private String formatHeaders(final HttpRequest request) {
+        return request.getHeaders().toString();
     }
 }

@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -15,11 +16,16 @@ import org.springframework.http.client.ClientHttpResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -43,7 +49,9 @@ public class ResponseLoggingInterceptorTest {
         final ClientHttpResponse response = mock(ClientHttpResponse.class);
         final ClientHttpRequestExecution execution = mock(ClientHttpRequestExecution.class);
         when(execution.execute(request, requestBody)).thenReturn(response);
-        final HttpHeaders headers = mock(HttpHeaders.class);
+        final HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Test", "testvalue");
+        headers.addAll("Accept", List.of("application/json", "text/plain"));
         when(response.getStatusCode()).thenReturn(statusCode);
         when(response.getHeaders()).thenReturn(headers);
         final String responseBodyText = "goodbye";
@@ -57,7 +65,7 @@ public class ResponseLoggingInterceptorTest {
         assertThat(actualResponse, is(sameInstance(response)));
         final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         verify(mockLogger).debug("Status  : {}", statusCode);
-        verify(mockLogger).debug("Headers : {}", headers);
+        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(mockLogger).debug("Body    : [{}]", responseBodyText);
         reset(mockLogger);
 
@@ -66,7 +74,7 @@ public class ResponseLoggingInterceptorTest {
         verify(response).getHeaders();
         verify(response).getBody();
         verify(execution).execute(request, requestBody);
-        verifyNoMoreInteractions(request, headers, execution, response);
+        verifyNoMoreInteractions(request, execution, response);
     }
 
     @Theory
@@ -99,5 +107,21 @@ public class ResponseLoggingInterceptorTest {
         // Verify mocks.
         verify(execution).execute(request, requestBody);
         verifyNoMoreInteractions(request, execution);
+    }
+
+    // TODO: Factor out, this is duplicated.
+    private ArgumentMatcher<String> containsHeaders(final HttpHeaders headers) {
+        return argument -> {
+
+            // Convert Map.Entry to string and search ignoring case.
+            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                final String headerPair = entry.toString();
+                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
+                if (!matches) {
+                    return false;
+                }
+            }
+            return true;
+        };
     }
 }

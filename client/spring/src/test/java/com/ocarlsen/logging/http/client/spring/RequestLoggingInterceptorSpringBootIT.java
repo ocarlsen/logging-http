@@ -2,6 +2,7 @@ package com.ocarlsen.logging.http.client.spring;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +36,14 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
@@ -132,7 +136,7 @@ public class RequestLoggingInterceptorSpringBootIT {
         final InOrder inOrder = inOrder(mockLogger);
         inOrder.verify(mockLogger).debug("Method  : {}", requestMethod);
         inOrder.verify(mockLogger).debug("URL:    : {}", requestUri.toUri());
-        inOrder.verify(mockLogger).debug("Headers : {}", requestHeaders);
+        inOrder.verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(requestHeaders)));
         inOrder.verify(mockLogger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();
     }
@@ -189,5 +193,21 @@ public class RequestLoggingInterceptorSpringBootIT {
 
             return restTemplate;
         }
+    }
+
+    // TODO: Factor out, this is duplicated.
+    private ArgumentMatcher<String> containsHeaders(final HttpHeaders headers) {
+        return argument -> {
+
+            // Convert Map.Entry to string and search ignoring case.
+            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                final String headerPair = entry.toString();
+                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
+                if (!matches) {
+                    return false;
+                }
+            }
+            return true;
+        };
     }
 }
