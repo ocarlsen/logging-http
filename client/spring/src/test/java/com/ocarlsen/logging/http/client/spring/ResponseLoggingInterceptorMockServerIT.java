@@ -59,9 +59,10 @@ public class ResponseLoggingInterceptorMockServerIT {
     @Test
     public void intercept() {
 
+        // Given
         final UriComponents requestUri = UriComponentsBuilder.fromUriString("/logging_test?abc=def").build();
         final String requestBody = "Hello!";
-        final HttpMethod requestMethod = HttpMethod.GET;
+        final HttpMethod requestMethod = HttpMethod.POST;
 
         // AbstractHttpMessageConverter#addDefaultHeaders will add Content-Type and Content-Length if we don't.
         final HttpHeaders requestHeaders = new HttpHeaders();
@@ -76,6 +77,7 @@ public class ResponseLoggingInterceptorMockServerIT {
         responseHeaders.setContentType(APPLICATION_JSON);
         responseHeaders.setContentLength(responseBody.length());
 
+        // Prepare mock
         mockServer.expect(requestTo(requestUri.toUriString()))
                   .andExpect(header(ACCEPT, APPLICATION_JSON_VALUE))
                   .andExpect(header(CONTENT_TYPE, TEXT_PLAIN_VALUE))
@@ -83,21 +85,25 @@ public class ResponseLoggingInterceptorMockServerIT {
                   .andExpect(method(requestMethod))
                   .andRespond(withStatus(responseStatus).headers(responseHeaders).body(responseBody));
 
+        // When
         final HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, requestHeaders);
         final ResponseEntity<String> responseEntity = restTemplate.exchange(requestUri.toUri(), requestMethod,
                 requestEntity, String.class);
 
+        // Then
         final HttpStatus actualStatus = responseEntity.getStatusCode();
         assertThat(actualStatus, is(responseStatus));
 
-        // Make sure response not consumed by filter.
-        final String actualBody = responseEntity.getBody();
-        assertThat(actualBody, is(responseBody));
+        // Make sure request not consumed by interceptor.
+        final String actualRequestBody = requestEntity.getBody();
+        assertThat(actualRequestBody, is(requestBody));
+
+        // Make sure response not consumed by interceptor.
+        final String actualResponseBody = responseEntity.getBody();
+        assertThat(actualResponseBody, is(responseBody));
 
         final HttpHeaders actualHeaders = responseEntity.getHeaders();
         assertThat(actualHeaders, is(responseHeaders));
-
-        mockServer.verify();
 
         final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         final InOrder inOrder = inOrder(mockLogger);
@@ -105,6 +111,9 @@ public class ResponseLoggingInterceptorMockServerIT {
         inOrder.verify(mockLogger).debug("Headers : {}", responseHeaders);
         inOrder.verify(mockLogger).debug("Body    : [{}]", responseBody);
         inOrder.verifyNoMoreInteractions();
+
+        // Verify mock
+        mockServer.verify();
     }
 
     @SuppressWarnings("unused")

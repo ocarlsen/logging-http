@@ -1,50 +1,29 @@
 package com.ocarlsen.logging.http.client.apache;
 
-import org.apache.http.Header;
-import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponseInterceptor;
-import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.message.BasicHeader;
 import org.junit.Test;
 
 import java.io.IOException;
 
-// TODO: Finish
-public class ResponseLoggingInterceptorTestManual {
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.http.HttpHeaders.ACCEPT;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
-    @Test
-    public void process() throws IOException {
+public class ResponseLoggingInterceptorTestManual extends AbstractLoggingInterceptorTestManual {
+
+    @Override
+    protected CloseableHttpClient buildClient() {
         final HttpResponseInterceptor responseInterceptor = new ResponseLoggingInterceptor();
-
-        //Creating a CloseableHttpClient object
-        try (final CloseableHttpClient httpclient = HttpClients.custom().addInterceptorFirst(responseInterceptor).build()) {
-
-            //Creating a request object
-            final HttpGet httpGet = new HttpGet("https://www.tutorialspoint.com/");
-
-            //Executing the request
-            final HttpResponse response = httpclient.execute(httpGet);
-
-            System.out.println(response.getStatusLine());
-
-            HttpEntity entity = response.getEntity();
-            final Header contentEncodingHeader = entity.getContentEncoding();
-            if (contentEncodingHeader != null) {
-                final HeaderElement[] encodings = contentEncodingHeader.getElements();
-                for (final HeaderElement encoding : encodings) {
-                    if (encoding.getName().equalsIgnoreCase("gzip")) {
-                        entity = new GzipDecompressingEntity(entity);
-                        break;
-                    }
-                }
-            }
-            final String body = EntityUtils.toString(entity);
-            System.out.println("body = " + body);
-        }
+        return HttpClients.custom().addInterceptorFirst(responseInterceptor).build();
     }
 }

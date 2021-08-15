@@ -123,8 +123,13 @@ public class RequestLoggingFilterIT {
         final HttpStatus actualStatus = responseEntity.getStatusCode();
         assertThat(actualStatus, is(responseStatus));
 
-        final String actualBody = responseEntity.getBody();
-        assertThat(actualBody, is(responseBody));
+        // Make sure request not consumed by filter.
+        final String actualRequestBody = requestEntity.getBody();
+        assertThat(actualRequestBody, is(requestBody));
+
+        // Make sure response not consumed by filter.
+        final String actualResponseBody = responseEntity.getBody();
+        assertThat(actualResponseBody, is(responseBody));
 
         final HttpHeaders actualHeaders = responseEntity.getHeaders();
         for (final Map.Entry<String, List<String>> entry : responseHeaders.entrySet()) {
