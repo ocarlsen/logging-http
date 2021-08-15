@@ -1,10 +1,15 @@
 package com.ocarlsen.logging.http.client.apache;
 
+import com.ocarlsen.logging.http.GzipContentEnablingEntity;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.RequestLine;
 import org.apache.http.StatusLine;
 import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.entity.GzipCompressingEntity;
+import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -22,6 +27,7 @@ import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
+// TODO: Write ITs for this package.
 public abstract class AbstractLoggingInterceptorTestManual {
 
     @Test
@@ -30,7 +36,7 @@ public abstract class AbstractLoggingInterceptorTestManual {
 
         httpGet.setHeader(new BasicHeader("sample-header", "My first header"));
         httpGet.setHeader(new BasicHeader("demo-header", "My second header"));
-        httpGet.setHeader(new BasicHeader("test-header", "My third header"));
+        httpGet.setHeader(new BasicHeader("multi-header", "My third header, another header"));
 
         process(httpGet);
     }
@@ -83,17 +89,38 @@ public abstract class AbstractLoggingInterceptorTestManual {
 
     protected void process(final HttpRequestBase httpRequest) throws IOException {
         try (final CloseableHttpClient httpclient = buildClient()) {
-            final HttpResponse response = httpclient.execute(httpRequest);
 
-            final StatusLine statusLine = response.getStatusLine();
-            System.out.println(statusLine);
+            final RequestLine requestLine = httpRequest.getRequestLine();
+            System.out.println(requestLine);
 
-            final Header[] allHeaders = response.getAllHeaders();
-            Arrays.stream(allHeaders).forEach(System.out::println);
+            final Header[] requestHeaders = httpRequest.getAllHeaders();
+            Arrays.stream(requestHeaders).forEach(System.out::println);
             System.out.println();
 
-            final HttpEntity entity = response.getEntity();
-            final String body = EntityUtils.toString(entity);
+            final HttpResponse httpResponse = httpclient.execute(httpRequest);
+
+            if (httpRequest instanceof HttpEntityEnclosingRequest) {
+                HttpEntity requestEntity = ((HttpEntityEnclosingRequest) httpRequest).getEntity();
+
+                // In case of GzipCompressingEntity, need to wrap so GzipDecompressingEntity can read content.
+                if (requestEntity instanceof GzipCompressingEntity) {
+                    requestEntity = new GzipContentEnablingEntity((GzipCompressingEntity) requestEntity);
+                    requestEntity = new GzipDecompressingEntity(requestEntity);
+                }
+
+                final String body = EntityUtils.toString(requestEntity);
+                System.out.println(body);
+            }
+
+            final StatusLine statusLine = httpResponse.getStatusLine();
+            System.out.println(statusLine);
+
+            final Header[] responseHeaders = httpResponse.getAllHeaders();
+            Arrays.stream(responseHeaders).forEach(System.out::println);
+            System.out.println();
+
+            final HttpEntity responseEntity = httpResponse.getEntity();
+            final String body = EntityUtils.toString(responseEntity);
             System.out.println(body);
         }
     }
