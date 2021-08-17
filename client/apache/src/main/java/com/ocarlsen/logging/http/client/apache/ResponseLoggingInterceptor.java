@@ -15,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import static java.lang.invoke.MethodHandles.lookup;
 
@@ -31,7 +33,9 @@ public class ResponseLoggingInterceptor implements HttpResponseInterceptor {
     // TODO: Response/Request logging formatter
     private void logResponse(final HttpResponse response) throws IOException {
         LOGGER.debug("Status  : {}", response.getStatusLine().getStatusCode());
-        LOGGER.debug("Headers : {}", Arrays.asList(response.getAllHeaders()));
+
+        final String headersFormatted = formatHeaders(response.getAllHeaders());
+        LOGGER.debug("Headers : {}", headersFormatted);
 
         HttpEntity entity = response.getEntity();
 
@@ -67,5 +71,16 @@ public class ResponseLoggingInterceptor implements HttpResponseInterceptor {
         }
     }
 
+    // TODO: Factor out, this is duplicated
+    private String formatHeaders(final Header[] headers) {
+        final LinkedHashMap<String, List<String>> headerMap = new LinkedHashMap<>();
+        for (final Header header : headers) {
+            final String headerName = header.getName();
+            final String headerValue = header.getValue();
+            final List<String> values = headerMap.computeIfAbsent(headerName, key -> new ArrayList<>());
+            values.add(headerValue);
+        }
+        return headerMap.toString();
+    }
 
 }

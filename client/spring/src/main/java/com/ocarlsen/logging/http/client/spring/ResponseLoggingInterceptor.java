@@ -35,9 +35,14 @@ public class ResponseLoggingInterceptor implements ClientHttpRequestInterceptor 
      */
     private void logResponse(final ClientHttpResponse response) throws IOException {
         LOGGER.debug("Status  : {}", response.getStatusCode());
-        LOGGER.debug("Headers : {}", response.getHeaders());
+        final String headersFormatted = formatHeaders(response);
+        LOGGER.debug("Headers : {}", headersFormatted);
 
         final String body = IOUtils.toString(response.getBody(), StandardCharsets.UTF_8);
         LOGGER.debug("Body    : [{}]", body);
+    }
+
+    private String formatHeaders(final ClientHttpResponse response) {
+        return response.getHeaders().toString();
     }
 }

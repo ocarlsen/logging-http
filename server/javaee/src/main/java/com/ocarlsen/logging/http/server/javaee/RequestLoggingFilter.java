@@ -12,9 +12,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static java.lang.invoke.MethodHandles.lookup;
@@ -40,7 +40,10 @@ public class RequestLoggingFilter implements Filter {
 
         logLevel.log(LOGGER, "Method  : {}", request.getMethod());
         logLevel.log(LOGGER, "URL     : {}", url.toString());
-        logLevel.log(LOGGER, "Headers : {}", getHeaders(request));
+
+        final String headerFormatted = formatHeaders(request);
+        logLevel.log(LOGGER, "Headers : {}", headerFormatted);
+
         final String body = new String(((ByteArrayHttpServletRequest) request).getCachedContent());
         logLevel.log(LOGGER, "Body    : [{}]", body);
 
@@ -65,18 +68,18 @@ public class RequestLoggingFilter implements Filter {
         this.logLevel = logLevel;
     }
 
-    private String getHeaders(final HttpServletRequest request) {
-        final List<String> headers = new ArrayList<>();
+    private String formatHeaders(final HttpServletRequest request) {
+        final LinkedHashMap<String, List<String>> headers = new LinkedHashMap<>();
         final Enumeration<String> headerNames = request.getHeaderNames();
         if (headerNames != null) {
-            Collections.list(headerNames).forEach(h -> headers.add(h + '=' + getHeaderValues(request, h)));
+            Collections.list(headerNames).forEach(h -> headers.put(h, getHeaderValues(request, h)));
         }
         return headers.toString();
     }
 
-    private String getHeaderValues(final HttpServletRequest request, final String headerName) {
+    private List<String> getHeaderValues(final HttpServletRequest request, final String headerName) {
         final Enumeration<String> headerValues = request.getHeaders(headerName);
-        return Collections.list(headerValues).toString();
+        return Collections.list(headerValues);
     }
 
 }

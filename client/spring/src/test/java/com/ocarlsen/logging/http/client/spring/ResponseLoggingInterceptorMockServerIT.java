@@ -3,6 +3,7 @@ package com.ocarlsen.logging.http.client.spring;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +23,15 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
+import java.util.Map;
+
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_LENGTH;
@@ -33,6 +40,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -83,6 +91,7 @@ public class ResponseLoggingInterceptorMockServerIT {
                   .andExpect(header(CONTENT_TYPE, TEXT_PLAIN_VALUE))
                   .andExpect(header(CONTENT_LENGTH, Integer.toString(requestBody.length())))
                   .andExpect(method(requestMethod))
+                  .andExpect(content().string(requestBody))
                   .andRespond(withStatus(responseStatus).headers(responseHeaders).body(responseBody));
 
         // When
@@ -108,7 +117,7 @@ public class ResponseLoggingInterceptorMockServerIT {
         final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         final InOrder inOrder = inOrder(mockLogger);
         inOrder.verify(mockLogger).debug("Status  : {}", responseStatus);
-        inOrder.verify(mockLogger).debug("Headers : {}", responseHeaders);
+        inOrder.verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
         inOrder.verify(mockLogger).debug("Body    : [{}]", responseBody);
         inOrder.verifyNoMoreInteractions();
 
@@ -133,5 +142,21 @@ public class ResponseLoggingInterceptorMockServerIT {
 
             return restTemplate;
         }
+    }
+
+    // TODO: Factor out, this is duplicated.
+    private ArgumentMatcher<String> containsHeaders(final HttpHeaders headers) {
+        return argument -> {
+
+            // Convert Map.Entry to string and search ignoring case.
+            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                final String headerPair = entry.toString();
+                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
+                if (!matches) {
+                    return false;
+                }
+            }
+            return true;
+        };
     }
 }

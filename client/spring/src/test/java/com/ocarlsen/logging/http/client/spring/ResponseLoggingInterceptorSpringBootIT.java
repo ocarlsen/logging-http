@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -139,25 +140,6 @@ public class ResponseLoggingInterceptorSpringBootIT {
         inOrder.verifyNoMoreInteractions();
     }
 
-    private ArgumentMatcher<HttpHeaders> containsHeaders(final HttpHeaders headers) {
-        return argument -> {
-
-            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                final String headerName = entry.getKey();
-                if (argument.containsKey(headerName)) {
-                    final List<String> headerValues = argument.get(headerName);
-                    final boolean matches = entry.getValue().equals(headerValues);
-                    if (!matches) {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            }
-            return true;
-        };
-    }
-
     @SuppressWarnings("SameParameterValue")
     // TODO: Factor out, this is duplicated
     private String createUrlWithPort(final String path) {
@@ -209,5 +191,21 @@ public class ResponseLoggingInterceptorSpringBootIT {
 
             return restTemplate;
         }
+    }
+
+    // TODO: Factor out, this is duplicated.
+    private ArgumentMatcher<String> containsHeaders(final HttpHeaders headers) {
+        return argument -> {
+
+            // Convert Map.Entry to string and search ignoring case.
+            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                final String headerPair = entry.toString();
+                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
+                if (!matches) {
+                    return false;
+                }
+            }
+            return true;
+        };
     }
 }

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,9 +22,9 @@ import java.util.zip.GZIPInputStream;
 
 import static java.lang.invoke.MethodHandles.lookup;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
 import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
 
-// TODO: Unit test
 public class RequestLoggingFilter extends Filter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(lookup().lookupClass());
@@ -35,6 +36,7 @@ public class RequestLoggingFilter extends Filter {
 
         InputStream requestBody = exchange.getRequestBody();
 
+        // TODO: Unit test
         // Handle content encoding
         final Headers headers = exchange.getRequestHeaders();
         final List<String> contentEncoding = headers.get(CONTENT_ENCODING);
@@ -48,15 +50,26 @@ public class RequestLoggingFilter extends Filter {
         }
 
         logLevel.log(LOGGER, "Method  : {}", exchange.getRequestMethod());
+
         final URI requestURI = buildUri(exchange);
         logLevel.log(LOGGER, "URL     : {}", requestURI);
-        logLevel.log(LOGGER, "Headers : {}", exchange.getRequestHeaders());
+
+        // TODO: Figure out how to defer string creation as it's expensive and logger may not use it.
+        final String headersFormatted = formatHeaders(headers);
+        logLevel.log(LOGGER, "Headers : {}", headersFormatted);
+
         final String bodyText = IOUtils.toString(requestBody, UTF_8);
         logLevel.log(LOGGER, "Body    : [{}]", bodyText);
 
         // InputStream is exhausted so restore it here.
-        requestBody = new ByteArrayInputStream(bodyText.getBytes(UTF_8));
-        exchange.setStreams(requestBody, exchange.getResponseBody());
+        // TODO: restore GZIP
+        if (requestBody.markSupported()) {
+            requestBody.reset();
+        } else {
+            requestBody = new ByteArrayInputStream(bodyText.getBytes(UTF_8));
+            final OutputStream responseBody = exchange.getResponseBody();
+            exchange.setStreams(requestBody, responseBody);
+        }
 
         chain.doFilter(exchange);
     }
@@ -67,22 +80,27 @@ public class RequestLoggingFilter extends Filter {
         return this.getClass().getSimpleName();
     }
 
-    // TODO: Test
     public LogLevel getLogLevel() {
         return logLevel;
     }
 
-    // TODO: Test
     public void setLogLevel(final LogLevel logLevel) {
         this.logLevel = logLevel;
+    }
+
+    private String formatHeaders(final Headers headers) {
+        return '{' + headers.entrySet()
+                            .stream()
+                            .map(e -> e.getKey() + "=" + e.getValue())
+                            .collect(joining(", ")) + '}';
     }
 
     private static URI buildUri(final HttpExchange httpExchange) {
         try {
             final HttpContext httpContext = httpExchange.getHttpContext();
-            final String path = httpContext.getPath();
             final String scheme = httpContext.getServer() instanceof HttpsServer ? "https" : "http";
             final URI requestURI = httpExchange.getRequestURI();
+            final String path = requestURI.getPath();
             final String queryParams = requestURI.getQuery();
             final InetSocketAddress addr = httpExchange.getLocalAddress();
             final String hostName = addr.getHostName();

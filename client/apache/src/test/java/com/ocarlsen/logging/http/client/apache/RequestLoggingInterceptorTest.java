@@ -5,9 +5,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.RequestLine;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.entity.GzipDecompressingEntity;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.protocol.HttpContext;
@@ -17,20 +19,25 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(Theories.class)
 public class RequestLoggingInterceptorTest {
@@ -48,8 +55,8 @@ public class RequestLoggingInterceptorTest {
         final String uri = "https://www.ocarlsen.com/path?query=search";
 
         // Prepare mocks
-        final Header header1 = mock(Header.class);
-        final Header header2 = mock(Header.class);
+        final Header header1 = new BasicHeader("X-Test", "testvalue");
+        final Header header2 = new BasicHeader("Accept", "application/json, text/plain");
         final Header[] headers = {header1, header2};
         final BasicHttpRequest httpRequest = new BasicHttpRequest(method, uri);
         httpRequest.setHeaders(headers);
@@ -62,13 +69,13 @@ public class RequestLoggingInterceptorTest {
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(mockLogger).debug("Method  : {}", method);
         verify(mockLogger).debug("URL:    : {}", uri);
-        verify(mockLogger).debug("Headers : {}", List.of(header1, header2));
+        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(mockLogger).debug("Body    : [{}]", "");
         verifyNoMoreInteractions(mockLogger);
         reset(mockLogger);
 
         // Verify mocks
-        verifyNoMoreInteractions(header1, header2, httpContext);
+        verifyNoMoreInteractions(httpContext);
     }
 
     @Theory
@@ -80,8 +87,8 @@ public class RequestLoggingInterceptorTest {
         final String bodyIn = "hello";
 
         // Prepare mocks
-        final Header header1 = mock(Header.class);
-        final Header header2 = mock(Header.class);
+        final Header header1 = new BasicHeader("X-Test", "testvalue");
+        final Header header2 = new BasicHeader("Accept", "application/json, text/plain");
         final Header[] headers = {header1, header2};
         final HttpEntity entityIn = EntityBuilder.create()
                                                  .setText(bodyIn)
@@ -99,7 +106,7 @@ public class RequestLoggingInterceptorTest {
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(mockLogger).debug("Method  : {}", method);
         verify(mockLogger).debug("URL:    : {}", uri);
-        verify(mockLogger).debug("Headers : {}", List.of(header1, header2));
+        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(mockLogger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(mockLogger);
         reset(mockLogger);
@@ -118,7 +125,7 @@ public class RequestLoggingInterceptorTest {
         assertThat(bodyOut, is(bodyIn));
 
         // Verify mocks
-        verifyNoMoreInteractions(header1, header2, httpContext);
+        verifyNoMoreInteractions(httpContext);
     }
 
     @Theory
@@ -130,8 +137,8 @@ public class RequestLoggingInterceptorTest {
         final String bodyIn = "hello";
 
         // Prepare mocks
-        final Header header1 = mock(Header.class);
-        final Header header2 = mock(Header.class);
+        final Header header1 = new BasicHeader("X-Test", "testvalue");
+        final Header header2 = new BasicHeader("Accept", "application/json, text/plain");
         final Header[] headers = {header1, header2};
         final HttpEntity entityIn = EntityBuilder.create()
                                                  .setText(bodyIn)
@@ -148,7 +155,7 @@ public class RequestLoggingInterceptorTest {
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(mockLogger).debug("Method  : {}", method);
         verify(mockLogger).debug("URL:    : {}", uri);
-        verify(mockLogger).debug("Headers : {}", List.of(header1, header2));
+        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(mockLogger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(mockLogger);
         reset(mockLogger);
@@ -162,7 +169,7 @@ public class RequestLoggingInterceptorTest {
         assertThat(bodyOut, is(bodyIn));
 
         // Verify mocks
-        verifyNoMoreInteractions(header1, header2, httpContext);
+        verifyNoMoreInteractions(httpContext);
     }
 
     @Theory
@@ -174,8 +181,8 @@ public class RequestLoggingInterceptorTest {
         final String bodyIn = "hello";
 
         // Prepare mocks
-        final Header header1 = mock(Header.class);
-        final Header header2 = mock(Header.class);
+        final Header header1 = new BasicHeader("X-Test", "testvalue");
+        final Header header2 = new BasicHeader("Accept", "application/json, text/plain");
         final Header[] headers = {header1, header2};
         final HttpEntity entityIn = EntityBuilder.create()
                                                  .setStream(IOUtils.toInputStream(bodyIn, UTF_8))
@@ -192,7 +199,7 @@ public class RequestLoggingInterceptorTest {
         final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(mockLogger).debug("Method  : {}", method);
         verify(mockLogger).debug("URL:    : {}", uri);
-        verify(mockLogger).debug("Headers : {}", List.of(header1, header2));
+        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(mockLogger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(mockLogger);
         reset(mockLogger);
@@ -207,6 +214,24 @@ public class RequestLoggingInterceptorTest {
         assertThat(bodyOut, is(bodyIn));
 
         // Verify mocks
-        verifyNoMoreInteractions(header1, header2, httpContext);
+        verifyNoMoreInteractions(httpContext);
+    }
+
+    // TODO: Factor out, this is duplicated.
+    private ArgumentMatcher<String> containsHeaders(final Header[] headers) {
+        return argument -> {
+
+            // Convert to string and search ignoring case.
+            for (final Header header : headers) {
+                final String headerName = header.getName();
+                final String headerValue = header.getValue();
+                final String headerPair = String.format("%s=[%s]", headerName, headerValue);
+                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
+                if (!matches) {
+                    return false;
+                }
+            }
+            return true;
+        };
     }
 }

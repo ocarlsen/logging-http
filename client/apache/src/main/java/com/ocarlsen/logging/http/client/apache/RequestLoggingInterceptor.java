@@ -16,7 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import static java.lang.invoke.MethodHandles.lookup;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -34,9 +36,8 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
         LOGGER.debug("Method  : {}", request.getRequestLine().getMethod());
         LOGGER.debug("URL:    : {}", request.getRequestLine().getUri());
 
-        // TODO: Confirm standard header format is List.
-        // TODO: Also make sure loggers all take Strings, not Headers objects or whatever.
-        LOGGER.debug("Headers : {}", Arrays.asList(request.getAllHeaders()));
+        final String headersFormatted = formatHeaders(request.getAllHeaders());
+        LOGGER.debug("Headers : {}", headersFormatted);
 
         final String body;
         if (request instanceof HttpEntityEnclosingRequest) {
@@ -78,4 +79,16 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
         LOGGER.debug("Body    : [{}]", body);
     }
 
+
+    // TODO: Factor out, this is duplicated
+    private String formatHeaders(final Header[] headers) {
+        final LinkedHashMap<String, List<String>> headerMap = new LinkedHashMap<>();
+        for (final Header header : headers) {
+            final String headerName = header.getName();
+            final String headerValue = header.getValue();
+            final List<String> values = headerMap.computeIfAbsent(headerName, key -> new ArrayList<>());
+            values.add(headerValue);
+        }
+        return headerMap.toString();
+    }
 }
