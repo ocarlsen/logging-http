@@ -56,6 +56,11 @@ public class RequestLoggingFilterTest {
     }
 
     @Test
+    public void description() {
+        assertThat(requestLoggingFilter.description(), is("RequestLoggingFilter"));
+    }
+
+    @Test
     public void doFilter_debug_markSupported() throws IOException, URISyntaxException {
 
         // Default level is DEBUG.
@@ -119,7 +124,6 @@ public class RequestLoggingFilterTest {
 
         requestLoggingFilter.setLogLevel(INFO);
         assertThat(requestLoggingFilter.getLogLevel(), CoreMatchers.is(INFO));
-
 
         // Given
         final String headerName = "Accept";

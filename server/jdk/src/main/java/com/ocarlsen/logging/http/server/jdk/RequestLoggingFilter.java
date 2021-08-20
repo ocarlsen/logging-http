@@ -67,14 +67,12 @@ public class RequestLoggingFilter extends Filter {
             requestBody.reset();
         } else {
             requestBody = new ByteArrayInputStream(bodyText.getBytes(UTF_8));
-            final OutputStream responseBody = exchange.getResponseBody();
-            exchange.setStreams(requestBody, responseBody);
+            exchange.setStreams(requestBody, exchange.getResponseBody());
         }
 
         chain.doFilter(exchange);
     }
 
-    // TODO: Test
     @Override
     public String description() {
         return this.getClass().getSimpleName();

@@ -30,6 +30,7 @@ public class RequestLoggingFilter implements Filter {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
+        // TODO: Check if markSupported before wrapping. See RequestLoggingFilter from 'jdk' package.
         request = new ByteArrayHttpServletRequest(request);
 
         final StringBuffer url = request.getRequestURL();

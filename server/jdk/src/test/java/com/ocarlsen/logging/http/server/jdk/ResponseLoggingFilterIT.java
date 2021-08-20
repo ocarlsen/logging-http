@@ -1,6 +1,5 @@
 package com.ocarlsen.logging.http.server.jdk;
 
-import com.ocarlsen.logging.http.GzipContentEnablingEntity;
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpContext;
@@ -13,8 +12,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.entity.EntityBuilder;
-import org.apache.http.client.entity.GzipCompressingEntity;
-import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -36,8 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,10 +47,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
-
-public class RequestLoggingFilterIT {
+public class ResponseLoggingFilterIT {
 
     public static final String PATH = "/testapp";
+
 
     private static StringResponseHandler httpHandler;
     private static HttpServer httpServer;
@@ -89,9 +84,9 @@ public class RequestLoggingFilterIT {
     }
 
     @Test
-    public void doFilter_get() throws IOException, URISyntaxException {
+    public void doFilter_get() throws IOException, InterruptedException {
 
-        context.getFilters().add(new RequestLoggingFilter());
+        context.getFilters().add(new ResponseLoggingFilter());
 
         // Given
         final String uri = String.format("http://localhost:%d%s?abc=def", port, PATH);
@@ -107,6 +102,9 @@ public class RequestLoggingFilterIT {
 
             // When
             final HttpResponse response = httpclient.execute(httpGet);
+
+            // Client may return before server filter chain is done executing.
+            Thread.sleep(1000);
 
             // Confidence checks
             assertThat(httpHandler.getRequestBodyText(), is(""));
@@ -133,18 +131,17 @@ public class RequestLoggingFilterIT {
         }
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingFilter.class);
-        verify(mockLogger).debug("Method  : {}", httpGet.getMethod());
-        verify(mockLogger).debug("URL     : {}", new URI(uri));
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", "");
+        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
+        verify(mockLogger).debug("Status  : {}", 200);
+        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeader("content-length", String.valueOf(responseBodyText.length()))));
+        verify(mockLogger).debug("Body    : [{}]", responseBodyText);
         reset(mockLogger);
     }
 
     @Test
-    public void doFilter_post_gzip() throws IOException, URISyntaxException {
+    public void doFilter_post() throws IOException, InterruptedException {
 
-        context.getFilters().add(new RequestLoggingFilter());
+        context.getFilters().add(new ResponseLoggingFilter());
 
         // Given
         final String uri = String.format("http://localhost:%d%s?abc=def", port, PATH);
@@ -156,7 +153,6 @@ public class RequestLoggingFilterIT {
         final String requestBodyText = "hello";
         final HttpEntity requestEntity = EntityBuilder.create()
                                                       .setText(requestBodyText)
-                                                      .gzipCompress() // Automatically sets content encoding header
                                                       .build();
         httpPost.setEntity(requestEntity);
         final String responseBodyText = "goodbye";
@@ -166,6 +162,9 @@ public class RequestLoggingFilterIT {
 
             // When
             final HttpResponse response = httpClient.execute(httpPost);
+
+            // Client may return before server filter chain is done executing.
+            Thread.sleep(1000);
 
             // Confidence checks
             assertThat(httpHandler.getRequestBodyText(), is(requestBodyText));
@@ -180,10 +179,7 @@ public class RequestLoggingFilterIT {
             }
 
             // Make sure request not consumed by filter.
-            final HttpEntity entityOut = new GzipDecompressingEntity(
-                    new GzipContentEnablingEntity(
-                            (GzipCompressingEntity) requestEntity));
-            final String actualRequestBody = EntityUtils.toString(entityOut);
+            final String actualRequestBody = EntityUtils.toString(requestEntity);
             assertThat(actualRequestBody, is(requestBodyText));
 
             final StatusLine statusLine = response.getStatusLine();
@@ -199,11 +195,10 @@ public class RequestLoggingFilterIT {
         }
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingFilter.class);
-        verify(mockLogger).debug("Method  : {}", httpPost.getMethod());
-        verify(mockLogger).debug("URL     : {}", new URI(uri));
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", requestBodyText);
+        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
+        verify(mockLogger).debug("Status  : {}", 200);
+        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeader("content-length", String.valueOf(responseBodyText.length()))));
+        verify(mockLogger).debug("Body    : [{}]", responseBodyText);
         reset(mockLogger);
     }
 
@@ -233,20 +228,14 @@ public class RequestLoggingFilterIT {
     }
 
     // TODO: Factor out, this is duplicated.
-    private ArgumentMatcher<String> containsHeaders(final Header[] headers) {
+    @SuppressWarnings("SameParameterValue")
+    private ArgumentMatcher<String> containsHeader(final String headerName, final String headerValue) {
         return argument -> {
 
+            // TODO: Figure out why runs twice
             // Convert to string and search ignoring case.
-            for (final Header header : headers) {
-                final String headerName = header.getName();
-                final String headerValue = header.getValue();
-                final String headerPair = String.format("%s=[%s]", headerName, headerValue);
-                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
-                if (!matches) {
-                    return false;
-                }
-            }
-            return true;
+            final String headerPair = String.format("%s=[%s]", headerName, headerValue);
+            return containsStringIgnoringCase(headerPair).matches(argument);
         };
     }
 

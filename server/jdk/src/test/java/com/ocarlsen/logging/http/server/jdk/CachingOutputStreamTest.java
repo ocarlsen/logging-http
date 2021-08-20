@@ -1,4 +1,4 @@
-package com.ocarlsen.logging.http.server.javaee;
+package com.ocarlsen.logging.http.server.jdk;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -7,7 +7,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import javax.servlet.WriteListener;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -20,25 +19,22 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-public class CachingServletOutputStreamTest {
+public class CachingOutputStreamTest {
 
-    private static final String DATA = "jklmnop";
+    private static final String DATA = "qrstuv";
 
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
-
-    private CachingServletOutputStream cachingServletOutputStream;
+    private CachingOutputStream cachingOutputStream;
     private OutputStream outputStream;
 
     @Before
     public void construct() {
         outputStream = mock(OutputStream.class);
-        cachingServletOutputStream = new CachingServletOutputStream(outputStream);
+        cachingOutputStream = new CachingOutputStream(outputStream);
     }
 
     @After
     public void close() throws IOException {
-        cachingServletOutputStream.close();
+        cachingOutputStream.close();
     }
 
     @After
@@ -49,24 +45,12 @@ public class CachingServletOutputStreamTest {
 
     @Test
     public void write_flush() throws IOException {
-        IOUtils.write(DATA, cachingServletOutputStream, UTF_8);
-        cachingServletOutputStream.flush();
+        IOUtils.write(DATA, cachingOutputStream, UTF_8);
+        cachingOutputStream.flush();
 
-        assertThat(cachingServletOutputStream.getBytes(), is(DATA.getBytes(UTF_8)));
+        assertThat(cachingOutputStream.getBytes(), is(DATA.getBytes(UTF_8)));
 
         verify(outputStream).flush();
         verify(outputStream, times(DATA.length())).write(anyInt());
-    }
-
-    @Test
-    public void isReady() {
-        assertThat(cachingServletOutputStream.isReady(), is(true));
-    }
-
-    @Test
-    public void setWriteListener() {
-        exception.expect(UnsupportedOperationException.class);
-        final WriteListener ignored = null;
-        cachingServletOutputStream.setWriteListener(ignored);
     }
 }
