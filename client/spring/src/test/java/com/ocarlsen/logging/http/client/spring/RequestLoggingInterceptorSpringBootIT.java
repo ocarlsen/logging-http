@@ -167,14 +167,13 @@ public class RequestLoggingInterceptorSpringBootIT {
     @EnableAutoConfiguration
     static class Config {
 
-        // TODO: do these need to be public?
         @Bean
-        public EchoController myController() {
+        EchoController echoController() {
             return new EchoController();
         }
 
         @Bean
-        public RestTemplate restTemplate() {
+        RestTemplate restTemplate() {
             final RestTemplate restTemplate = new RestTemplate();
 
             // Make sure buffering enabled.

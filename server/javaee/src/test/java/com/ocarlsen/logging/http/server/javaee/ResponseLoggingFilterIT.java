@@ -65,7 +65,7 @@ public class ResponseLoggingFilterIT {
 
     @SuppressWarnings("unused")
     @Autowired
-    private MyController myController;
+    private EchoController echoController;
 
     @SuppressWarnings("unused")
     @Autowired
@@ -77,7 +77,7 @@ public class ResponseLoggingFilterIT {
 
     @Test
     public void contextLoads() {
-        assertNotNull(myController);
+        assertNotNull(echoController);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class ResponseLoggingFilterIT {
                 requestEntity, String.class);
 
         final HttpStatus responseStatus = HttpStatus.OK;
-        final String responseBody = myController.echo(requestBody, requestId);
+        final String responseBody = echoController.echo(requestBody, requestId);
         final HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setContentType(APPLICATION_JSON_UTF8);
         responseHeaders.setContentLength(responseBody.length());
@@ -167,7 +167,7 @@ public class ResponseLoggingFilterIT {
     }
 
     @Controller
-    static class MyController {
+    static class EchoController {
 
         @SuppressWarnings("unused")
         @PostMapping(value = CONTROLLER_URI, consumes = TEXT_PLAIN_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -184,8 +184,8 @@ public class ResponseLoggingFilterIT {
     static class Config {
 
         @Bean
-        MyController myController() {
-            return new MyController();
+        EchoController echoController() {
+            return new EchoController();
         }
 
         @Bean

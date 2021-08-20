@@ -168,12 +168,12 @@ public class ResponseLoggingInterceptorSpringBootIT {
     static class Config {
 
         @Bean
-        public EchoController myController() {
+        EchoController echoController() {
             return new EchoController();
         }
 
         @Bean
-        public RestTemplate restTemplate() {
+        RestTemplate restTemplate() {
             final RestTemplate restTemplate = new RestTemplate();
 
             // Need buffering request factory for response logging.
