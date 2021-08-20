@@ -66,13 +66,13 @@ public class RequestLoggingInterceptorTest {
         requestInterceptor.process(httpRequest, httpContext);
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
-        verify(mockLogger).debug("Method  : {}", method);
-        verify(mockLogger).debug("URL:    : {}", uri);
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", "");
-        verifyNoMoreInteractions(mockLogger);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
+        verify(logger).debug("Method  : {}", method);
+        verify(logger).debug("URL:    : {}", uri);
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug("Body    : [{}]", "");
+        verifyNoMoreInteractions(logger);
+        reset(logger);
 
         // Verify mocks
         verifyNoMoreInteractions(httpContext);
@@ -103,13 +103,13 @@ public class RequestLoggingInterceptorTest {
         requestInterceptor.process(httpRequest, httpContext);
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
-        verify(mockLogger).debug("Method  : {}", method);
-        verify(mockLogger).debug("URL:    : {}", uri);
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", bodyIn);
-        verifyNoMoreInteractions(mockLogger);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
+        verify(logger).debug("Method  : {}", method);
+        verify(logger).debug("URL:    : {}", uri);
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug("Body    : [{}]", bodyIn);
+        verifyNoMoreInteractions(logger);
+        reset(logger);
 
         // Entity not replaced.
         HttpEntity entityOut = httpRequest.getEntity();
@@ -152,13 +152,13 @@ public class RequestLoggingInterceptorTest {
         requestInterceptor.process(httpRequest, httpContext);
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
-        verify(mockLogger).debug("Method  : {}", method);
-        verify(mockLogger).debug("URL:    : {}", uri);
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", bodyIn);
-        verifyNoMoreInteractions(mockLogger);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
+        verify(logger).debug("Method  : {}", method);
+        verify(logger).debug("URL:    : {}", uri);
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug("Body    : [{}]", bodyIn);
+        verifyNoMoreInteractions(logger);
+        reset(logger);
 
         // Entity not replaced.
         final HttpEntity entityOut = httpRequest.getEntity();
@@ -196,13 +196,13 @@ public class RequestLoggingInterceptorTest {
         requestInterceptor.process(httpRequest, httpContext);
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
-        verify(mockLogger).debug("Method  : {}", method);
-        verify(mockLogger).debug("URL:    : {}", uri);
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", bodyIn);
-        verifyNoMoreInteractions(mockLogger);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
+        verify(logger).debug("Method  : {}", method);
+        verify(logger).debug("URL:    : {}", uri);
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug("Body    : [{}]", bodyIn);
+        verifyNoMoreInteractions(logger);
+        reset(logger);
 
         // Entity is replaced.
         final HttpEntity entityOut = httpRequest.getEntity();

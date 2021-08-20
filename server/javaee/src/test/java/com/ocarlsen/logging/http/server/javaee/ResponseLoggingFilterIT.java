@@ -93,6 +93,7 @@ public class ResponseLoggingFilterIT {
     @Test
     public void loggingFilter() {
 
+        // TODO: Given, When, Then
         final int requestId = 1234;
         final UriComponents requestUri = UriComponentsBuilder
                 .fromUriString(createUrlWithPort(CONTROLLER_URI))
@@ -135,12 +136,12 @@ public class ResponseLoggingFilterIT {
             assertThat(actualHeaders, hasEntry(entry.getKey(), entry.getValue()));
         }
 
-        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
-        final InOrder inOrder = inOrder(mockLogger);
-        inOrder.verify(mockLogger).debug("Starting {} (logLevel={})", "ResponseLoggingFilter", DEBUG);
-        inOrder.verify(mockLogger).debug("Status  : {}", responseStatus.value());
-        inOrder.verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
-        inOrder.verify(mockLogger).debug("Body    : [{}]", responseBody);
+        final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
+        final InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).debug("Starting {} (logLevel={})", "ResponseLoggingFilter", DEBUG);
+        inOrder.verify(logger).debug("Status  : {}", responseStatus.value());
+        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
+        inOrder.verify(logger).debug("Body    : [{}]", responseBody);
         inOrder.verifyNoMoreInteractions();
     }
 

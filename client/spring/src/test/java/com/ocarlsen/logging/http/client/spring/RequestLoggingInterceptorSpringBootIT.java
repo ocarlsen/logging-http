@@ -90,6 +90,7 @@ public class RequestLoggingInterceptorSpringBootIT {
     @Test
     public void intercept() {
 
+        // TODO: Given, When, Then
         final int requestId = 1234;
         final UriComponents requestUri = UriComponentsBuilder
                 .fromUriString(createUrlWithPort(CONTROLLER_URI))
@@ -110,14 +111,13 @@ public class RequestLoggingInterceptorSpringBootIT {
         final ResponseEntity<String> responseEntity = restTemplate.exchange(requestUri.toUri(), requestMethod,
                 requestEntity, String.class);
 
-        final HttpStatus responseStatus = HttpStatus.OK;
         final String responseBody = echoController.echo(requestBody, requestId);
         final HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setContentType(APPLICATION_JSON_UTF8);
         responseHeaders.setContentLength(responseBody.length());
 
-        final HttpStatus actualStatus = responseEntity.getStatusCode();
-        assertThat(actualStatus, is(responseStatus));
+        final HttpStatus responseStatus = responseEntity.getStatusCode();
+        assertThat(responseStatus, is(HttpStatus.OK));
 
         // Make sure request not consumed by interceptor.
         final String actualRequestBody = requestEntity.getBody();
@@ -132,12 +132,12 @@ public class RequestLoggingInterceptorSpringBootIT {
             assertThat(actualHeaders, hasEntry(entry.getKey(), entry.getValue()));
         }
 
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
-        final InOrder inOrder = inOrder(mockLogger);
-        inOrder.verify(mockLogger).debug("Method  : {}", requestMethod);
-        inOrder.verify(mockLogger).debug("URL:    : {}", requestUri.toUri());
-        inOrder.verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(requestHeaders)));
-        inOrder.verify(mockLogger).debug("Body    : [{}]", requestBody);
+        final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
+        final InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).debug("Method  : {}", requestMethod);
+        inOrder.verify(logger).debug("URL:    : {}", requestUri.toUri());
+        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(requestHeaders)));
+        inOrder.verify(logger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -167,6 +167,7 @@ public class RequestLoggingInterceptorSpringBootIT {
     @EnableAutoConfiguration
     static class Config {
 
+        // TODO: do these need to be public?
         @Bean
         public EchoController myController() {
             return new EchoController();

@@ -63,11 +63,11 @@ public class ResponseLoggingInterceptorTest {
 
         // Then
         assertThat(actualResponse, is(sameInstance(response)));
-        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
-        verify(mockLogger).debug("Status  : {}", statusCode);
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", responseBodyText);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
+        verify(logger).debug("Status  : {}", statusCode);
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug("Body    : [{}]", responseBodyText);
+        reset(logger);
 
         // Verify mocks.
         verify(response).getStatusCode();
@@ -100,9 +100,9 @@ public class ResponseLoggingInterceptorTest {
         }
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
-        verifyNoMoreInteractions(mockLogger);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
+        verifyNoMoreInteractions(logger);
+        reset(logger);
 
         // Verify mocks.
         verify(execution).execute(request, requestBody);

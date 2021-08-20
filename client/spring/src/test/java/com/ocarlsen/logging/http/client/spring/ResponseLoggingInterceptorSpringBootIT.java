@@ -90,6 +90,7 @@ public class ResponseLoggingInterceptorSpringBootIT {
     @Test
     public void intercept() {
 
+        // TODO: Given, When, Then
         final int requestId = 1234;
         final UriComponents requestUri = UriComponentsBuilder
                 .fromUriString(createUrlWithPort(CONTROLLER_URI))
@@ -132,11 +133,11 @@ public class ResponseLoggingInterceptorSpringBootIT {
             assertThat(actualHeaders, hasEntry(entry.getKey(), entry.getValue()));
         }
 
-        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
-        final InOrder inOrder = inOrder(mockLogger);
-        inOrder.verify(mockLogger).debug("Status  : {}", responseStatus);
-        inOrder.verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
-        inOrder.verify(mockLogger).debug("Body    : [{}]", responseBody);
+        final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
+        final InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).debug("Status  : {}", responseStatus);
+        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
+        inOrder.verify(logger).debug("Body    : [{}]", responseBody);
         inOrder.verifyNoMoreInteractions();
     }
 

@@ -114,11 +114,11 @@ public class ResponseLoggingInterceptorMockServerIT {
         final HttpHeaders actualHeaders = responseEntity.getHeaders();
         assertThat(actualHeaders, is(responseHeaders));
 
-        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
-        final InOrder inOrder = inOrder(mockLogger);
-        inOrder.verify(mockLogger).debug("Status  : {}", responseStatus);
-        inOrder.verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
-        inOrder.verify(mockLogger).debug("Body    : [{}]", responseBody);
+        final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
+        final InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).debug("Status  : {}", responseStatus);
+        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
+        inOrder.verify(logger).debug("Body    : [{}]", responseBody);
         inOrder.verifyNoMoreInteractions();
 
         // Verify mock

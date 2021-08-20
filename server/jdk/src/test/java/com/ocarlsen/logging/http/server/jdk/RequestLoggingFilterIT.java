@@ -133,12 +133,12 @@ public class RequestLoggingFilterIT {
         }
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingFilter.class);
-        verify(mockLogger).debug("Method  : {}", httpGet.getMethod());
-        verify(mockLogger).debug("URL     : {}", new URI(uri));
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", "");
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
+        verify(logger).debug("Method  : {}", httpGet.getMethod());
+        verify(logger).debug("URL     : {}", new URI(uri));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug("Body    : [{}]", "");
+        reset(logger);
     }
 
     @Test
@@ -199,12 +199,12 @@ public class RequestLoggingFilterIT {
         }
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingFilter.class);
-        verify(mockLogger).debug("Method  : {}", httpPost.getMethod());
-        verify(mockLogger).debug("URL     : {}", new URI(uri));
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", requestBodyText);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
+        verify(logger).debug("Method  : {}", httpPost.getMethod());
+        verify(logger).debug("URL     : {}", new URI(uri));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug("Body    : [{}]", requestBodyText);
+        reset(logger);
     }
 
     @SuppressWarnings("SameParameterValue")

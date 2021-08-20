@@ -62,13 +62,13 @@ public class RequestLoggingInterceptorTest {
 
         // Then
         assertThat(actualResponse, is(sameInstance(response)));
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
-        verify(mockLogger).debug("Method  : {}", method);
-        verify(mockLogger).debug("URL:    : {}", uri);
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", bodyText);
-        verifyNoMoreInteractions(mockLogger);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
+        verify(logger).debug("Method  : {}", method);
+        verify(logger).debug("URL:    : {}", uri);
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug("Body    : [{}]", bodyText);
+        verifyNoMoreInteractions(logger);
+        reset(logger);
 
         // Verify mocks.
         verify(request).getMethod();
@@ -108,12 +108,12 @@ public class RequestLoggingInterceptorTest {
         }
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
-        verify(mockLogger).debug("Method  : {}", method);
-        verify(mockLogger).debug("URL:    : {}", uri);
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
-        verify(mockLogger).debug("Body    : [{}]", bodyText);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
+        verify(logger).debug("Method  : {}", method);
+        verify(logger).debug("URL:    : {}", uri);
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug("Body    : [{}]", bodyText);
+        reset(logger);
 
         // Verify mocks.
         verify(request).getMethod();

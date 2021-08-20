@@ -131,11 +131,11 @@ public class ResponseLoggingFilterIT {
         }
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
-        verify(mockLogger).debug("Status  : {}", 200);
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeader("content-length", String.valueOf(responseBodyText.length()))));
-        verify(mockLogger).debug("Body    : [{}]", responseBodyText);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
+        verify(logger).debug("Status  : {}", 200);
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeader("content-length", String.valueOf(responseBodyText.length()))));
+        verify(logger).debug("Body    : [{}]", responseBodyText);
+        reset(logger);
     }
 
     @Test
@@ -195,11 +195,11 @@ public class ResponseLoggingFilterIT {
         }
 
         // Then
-        final Logger mockLogger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
-        verify(mockLogger).debug("Status  : {}", 200);
-        verify(mockLogger).debug(eq("Headers : {}"), argThat(containsHeader("content-length", String.valueOf(responseBodyText.length()))));
-        verify(mockLogger).debug("Body    : [{}]", responseBodyText);
-        reset(mockLogger);
+        final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
+        verify(logger).debug("Status  : {}", 200);
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeader("content-length", String.valueOf(responseBodyText.length()))));
+        verify(logger).debug("Body    : [{}]", responseBodyText);
+        reset(logger);
     }
 
     @SuppressWarnings("SameParameterValue")
