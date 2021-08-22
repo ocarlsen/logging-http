@@ -34,7 +34,7 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
 
     private void logRequest(final HttpRequest request) throws IOException {
         LOGGER.debug("Method  : {}", request.getRequestLine().getMethod());
-        LOGGER.debug("URL:    : {}", request.getRequestLine().getUri());
+        LOGGER.debug("URL     : {}", request.getRequestLine().getUri());
 
         final String headersFormatted = formatHeaders(request.getAllHeaders());
         LOGGER.debug("Headers : {}", headersFormatted);

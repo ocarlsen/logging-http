@@ -25,7 +25,7 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
 
     private void logRequest(final HttpRequest request, final byte[] body) {
         LOGGER.debug("Method  : {}", request.getMethod());
-        LOGGER.debug("URL:    : {}", request.getURI());
+        LOGGER.debug("URL     : {}", request.getURI());
         final String headerFormatted = formatHeaders(request);
         LOGGER.debug("Headers : {}", headerFormatted);
         LOGGER.debug("Body    : [{}]", new String(body, UTF_8));

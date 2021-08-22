@@ -68,7 +68,7 @@ public class RequestLoggingInterceptorTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
-        verify(logger).debug("URL:    : {}", uri);
+        verify(logger).debug("URL     : {}", uri);
         verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(logger).debug("Body    : [{}]", "");
         verifyNoMoreInteractions(logger);
@@ -105,7 +105,7 @@ public class RequestLoggingInterceptorTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
-        verify(logger).debug("URL:    : {}", uri);
+        verify(logger).debug("URL     : {}", uri);
         verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
@@ -154,7 +154,7 @@ public class RequestLoggingInterceptorTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
-        verify(logger).debug("URL:    : {}", uri);
+        verify(logger).debug("URL     : {}", uri);
         verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
@@ -198,7 +198,7 @@ public class RequestLoggingInterceptorTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
-        verify(logger).debug("URL:    : {}", uri);
+        verify(logger).debug("URL     : {}", uri);
         verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
