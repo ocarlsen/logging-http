@@ -87,6 +87,7 @@ public class RequestLoggingInterceptorSpringBootIT {
         assertNotNull(restTemplate);
     }
 
+    @SuppressWarnings("UnnecessaryToStringCall")
     @Test
     public void intercept() {
 
@@ -134,8 +135,8 @@ public class RequestLoggingInterceptorSpringBootIT {
 
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         final InOrder inOrder = inOrder(logger);
-        inOrder.verify(logger).debug("Method  : {}", requestMethod);
-        inOrder.verify(logger).debug("URL     : {}", requestUri.toUri());
+        inOrder.verify(logger).debug("Method  : {}", requestMethod.name());
+        inOrder.verify(logger).debug("URL     : {}", requestUri.toUri().toString());
         inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(requestHeaders)));
         inOrder.verify(logger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();

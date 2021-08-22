@@ -64,7 +64,7 @@ public class ResponseLoggingInterceptorTest {
         // Then
         assertThat(actualResponse, is(sameInstance(response)));
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
-        verify(logger).debug("Status  : {}", statusCode);
+        verify(logger).debug("Status  : {}", statusCode.value());
         verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(logger).debug("Body    : [{}]", responseBodyText);
         reset(logger);

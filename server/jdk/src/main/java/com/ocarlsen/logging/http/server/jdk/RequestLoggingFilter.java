@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -52,7 +51,7 @@ public class RequestLoggingFilter extends Filter {
         logLevel.log(LOGGER, "Method  : {}", exchange.getRequestMethod());
 
         final URI requestURI = buildUri(exchange);
-        logLevel.log(LOGGER, "URL     : {}", requestURI);
+        logLevel.log(LOGGER, "URL     : {}", requestURI.toString());
 
         // TODO: Figure out how to defer string creation as it's expensive and logger may not use it.
         final String headersFormatted = formatHeaders(headers);

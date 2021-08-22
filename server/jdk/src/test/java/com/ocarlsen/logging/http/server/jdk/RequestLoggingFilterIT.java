@@ -36,8 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
@@ -89,7 +87,7 @@ public class RequestLoggingFilterIT {
     }
 
     @Test
-    public void doFilter_get() throws IOException, URISyntaxException {
+    public void doFilter_get() throws IOException {
 
         context.getFilters().add(new RequestLoggingFilter());
 
@@ -135,14 +133,14 @@ public class RequestLoggingFilterIT {
         // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(logger).debug("Method  : {}", httpGet.getMethod());
-        verify(logger).debug("URL     : {}", new URI(uri));
+        verify(logger).debug("URL     : {}", uri);
         verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(logger).debug("Body    : [{}]", "");
         reset(logger);
     }
 
     @Test
-    public void doFilter_post_gzip() throws IOException, URISyntaxException {
+    public void doFilter_post_gzip() throws IOException {
 
         context.getFilters().add(new RequestLoggingFilter());
 
@@ -201,7 +199,7 @@ public class RequestLoggingFilterIT {
         // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(logger).debug("Method  : {}", httpPost.getMethod());
-        verify(logger).debug("URL     : {}", new URI(uri));
+        verify(logger).debug("URL     : {}", uri);
         verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(logger).debug("Body    : [{}]", requestBodyText);
         reset(logger);

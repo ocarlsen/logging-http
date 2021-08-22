@@ -135,7 +135,7 @@ public class ResponseLoggingInterceptorSpringBootIT {
 
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         final InOrder inOrder = inOrder(logger);
-        inOrder.verify(logger).debug("Status  : {}", responseStatus);
+        inOrder.verify(logger).debug("Status  : {}", responseStatus.value());
         inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
         inOrder.verify(logger).debug("Body    : [{}]", responseBody);
         inOrder.verifyNoMoreInteractions();

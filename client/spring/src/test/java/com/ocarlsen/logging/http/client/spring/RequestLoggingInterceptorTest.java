@@ -35,6 +35,7 @@ import static org.mockito.Mockito.when;
 @RunWith(Theories.class)
 public class RequestLoggingInterceptorTest {
 
+    @SuppressWarnings("UnnecessaryToStringCall")
     @Theory
     @Test
     public void intercept(final HttpMethod method) throws IOException, URISyntaxException {
@@ -63,8 +64,8 @@ public class RequestLoggingInterceptorTest {
         // Then
         assertThat(actualResponse, is(sameInstance(response)));
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
-        verify(logger).debug("Method  : {}", method);
-        verify(logger).debug("URL     : {}", uri);
+        verify(logger).debug("Method  : {}", method.name());
+        verify(logger).debug("URL     : {}", uri.toString());
         verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(logger).debug("Body    : [{}]", bodyText);
         verifyNoMoreInteractions(logger);
@@ -78,6 +79,7 @@ public class RequestLoggingInterceptorTest {
         verifyNoMoreInteractions(request, execution, response);
     }
 
+    @SuppressWarnings("UnnecessaryToStringCall")
     @Theory
     @Test
     public void intercept_exception(final HttpMethod method) throws IOException, URISyntaxException {
@@ -109,8 +111,8 @@ public class RequestLoggingInterceptorTest {
 
         // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
-        verify(logger).debug("Method  : {}", method);
-        verify(logger).debug("URL     : {}", uri);
+        verify(logger).debug("Method  : {}", method.name());
+        verify(logger).debug("URL     : {}", uri.toString());
         verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
         verify(logger).debug("Body    : [{}]", bodyText);
         reset(logger);

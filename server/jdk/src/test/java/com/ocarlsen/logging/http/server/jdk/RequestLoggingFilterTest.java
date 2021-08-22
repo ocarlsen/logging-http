@@ -60,6 +60,7 @@ public class RequestLoggingFilterTest {
         assertThat(requestLoggingFilter.description(), is("RequestLoggingFilter"));
     }
 
+    @SuppressWarnings("UnnecessaryToStringCall")
     @Test
     public void doFilter_debug_markSupported() throws IOException, URISyntaxException {
 
@@ -98,7 +99,7 @@ public class RequestLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(logger).debug("Method  : {}", method);
-        verify(logger).debug("URL     : {}", new URI("https", null, hostName, port, path, queryString, null));
+        verify(logger).debug("URL     : {}", new URI("https", null, hostName, port, path, queryString, null).toString());
         verify(logger).debug("Headers : {}", '{' + headerName + '=' + headerValues + '}');
         verify(logger).debug("Body    : [{}]", requestBody);
 
@@ -119,6 +120,7 @@ public class RequestLoggingFilterTest {
         verify(chain).doFilter(httpExchange);
     }
 
+    @SuppressWarnings("UnnecessaryToStringCall")
     @Test
     public void doFilter_info_markNotSupported() throws IOException, URISyntaxException {
 
@@ -166,7 +168,7 @@ public class RequestLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(logger).info("Method  : {}", method);
-        verify(logger).info("URL     : {}", new URI("https", null, hostName, port, path, queryString, null));
+        verify(logger).info("URL     : {}", new URI("https", null, hostName, port, path, queryString, null).toString());
         verify(logger).info("Headers : {}", '{' + headerName + '=' + headerValues + '}');
         verify(logger).info("Body    : [{}]", requestBody);
 
