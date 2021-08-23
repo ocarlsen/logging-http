@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.test.context.ContextConfiguration;
@@ -100,26 +101,22 @@ public class ResponseLoggingInterceptorMockServerIT {
                 requestEntity, String.class);
 
         // Then
-        final HttpStatus actualStatus = responseEntity.getStatusCode();
-        assertThat(actualStatus, is(responseStatus));
-
-        // Make sure request not consumed by interceptor.
-        final String actualRequestBody = requestEntity.getBody();
-        assertThat(actualRequestBody, is(requestBody));
-
-        // Make sure response not consumed by interceptor.
-        final String actualResponseBody = responseEntity.getBody();
-        assertThat(actualResponseBody, is(responseBody));
-
-        final HttpHeaders actualHeaders = responseEntity.getHeaders();
-        assertThat(actualHeaders, is(responseHeaders));
-
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         final InOrder inOrder = inOrder(logger);
         inOrder.verify(logger).debug("Status  : {}", responseStatus.value());
         inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(responseHeaders)));
         inOrder.verify(logger).debug("Body    : [{}]", responseBody);
         inOrder.verifyNoMoreInteractions();
+
+        // Confidence checks
+        final HttpStatus actualStatus = responseEntity.getStatusCode();
+        assertThat(actualStatus, is(responseStatus));
+
+        final String actualResponseBody = responseEntity.getBody();
+        assertThat(actualResponseBody, is(responseBody));
+
+        final HttpHeaders actualHeaders = responseEntity.getHeaders();
+        assertThat(actualHeaders, is(responseHeaders));
 
         // Verify mock
         mockServer.verify();
@@ -128,10 +125,18 @@ public class ResponseLoggingInterceptorMockServerIT {
     @SuppressWarnings("unused")
     static class Config {
 
+
         @Bean
-        RestTemplate restTemplate() {
+        ResponseLoggingInterceptor loggingInterceptor() {
+            return new ResponseLoggingInterceptor();
+        }
+
+        @Bean
+        RestTemplate restTemplate(final ClientHttpRequestInterceptor interceptor) {
             final RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getInterceptors().add(new ResponseLoggingInterceptor());
+
+            // Add interceptor under test
+            restTemplate.getInterceptors().add(interceptor);
 
             // Disable annoying "Accept-Charset" header, interferes with test.
             for (final HttpMessageConverter<?> converter : restTemplate.getMessageConverters()) {

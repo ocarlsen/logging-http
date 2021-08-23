@@ -17,7 +17,8 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(lookup().lookupClass());
 
     @Override
-    public ClientHttpResponse intercept(final HttpRequest request, final byte[] body, final ClientHttpRequestExecution execution) throws IOException {
+    public ClientHttpResponse intercept(final HttpRequest request, final byte[] body, final ClientHttpRequestExecution execution)
+            throws IOException {
         logRequest(request, body);
         return execution.execute(request, body);
     }
@@ -28,6 +29,7 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
         LOGGER.debug("URL     : {}", request.getURI().toString());
         final String headerFormatted = formatHeaders(request);
         LOGGER.debug("Headers : {}", headerFormatted);
+
         LOGGER.debug("Body    : [{}]", new String(body, UTF_8));
     }
 

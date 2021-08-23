@@ -53,13 +53,13 @@ public class RequestLoggingInterceptorTest {
 
         // Given
         final String uri = "https://www.ocarlsen.com/path?query=search";
-
-        // Prepare mocks
         final Header header1 = new BasicHeader("X-Test", "testvalue");
         final Header header2 = new BasicHeader("Accept", "application/json, text/plain");
         final Header[] headers = {header1, header2};
         final BasicHttpRequest httpRequest = new BasicHttpRequest(method, uri);
         httpRequest.setHeaders(headers);
+
+        // Prepare mocks
         final HttpContext httpContext = mock(HttpContext.class);
 
         // When
@@ -85,8 +85,6 @@ public class RequestLoggingInterceptorTest {
         // Given
         final String uri = "https://www.ocarlsen.com/path?query=search";
         final String bodyIn = "hello";
-
-        // Prepare mocks
         final Header header1 = new BasicHeader("X-Test", "testvalue");
         final Header header2 = new BasicHeader("Accept", "application/json, text/plain");
         final Header[] headers = {header1, header2};
@@ -97,7 +95,9 @@ public class RequestLoggingInterceptorTest {
         final HttpEntityEnclosingRequest httpRequest = new BasicHttpEntityEnclosingRequest(method, uri);
         httpRequest.setHeaders(headers);
         httpRequest.setEntity(entityIn);
-        final HttpContext httpContext = mock(HttpContext.class);
+
+        // Prepare mocks
+         final HttpContext httpContext = mock(HttpContext.class);
 
         // When
         requestInterceptor.process(httpRequest, httpContext);
@@ -135,8 +135,6 @@ public class RequestLoggingInterceptorTest {
         // Given
         final String uri = "https://www.ocarlsen.com/path?query=search";
         final String bodyIn = "hello";
-
-        // Prepare mocks
         final Header header1 = new BasicHeader("X-Test", "testvalue");
         final Header header2 = new BasicHeader("Accept", "application/json, text/plain");
         final Header[] headers = {header1, header2};
@@ -146,6 +144,8 @@ public class RequestLoggingInterceptorTest {
         final HttpEntityEnclosingRequest httpRequest = new BasicHttpEntityEnclosingRequest(method, uri);
         httpRequest.setHeaders(headers);
         httpRequest.setEntity(entityIn);
+
+        // Prepare mocks
         final HttpContext httpContext = mock(HttpContext.class);
 
         // When

@@ -1,6 +1,5 @@
 package com.ocarlsen.logging.http.server.javaee;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import java.util.List;
 
 import static com.ocarlsen.logging.LogLevel.DEBUG;
 import static com.ocarlsen.logging.LogLevel.INFO;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -54,7 +54,7 @@ public class RequestLoggingFilterTest {
     public void doFilter() throws ServletException, IOException {
 
         // Default level is DEBUG.
-        assertThat(requestLoggingFilter.getLogLevel(), CoreMatchers.is(DEBUG));
+        assertThat(requestLoggingFilter.getLogLevel(), is(DEBUG));
 
         // Given
         final String method = "POST";
@@ -102,7 +102,7 @@ public class RequestLoggingFilterTest {
     public void doFilter_info() throws ServletException, IOException {
 
         requestLoggingFilter.setLogLevel(INFO);
-        assertThat(requestLoggingFilter.getLogLevel(), CoreMatchers.is(INFO));
+        assertThat(requestLoggingFilter.getLogLevel(), is(INFO));
 
         // Given
         final String method = "POST";

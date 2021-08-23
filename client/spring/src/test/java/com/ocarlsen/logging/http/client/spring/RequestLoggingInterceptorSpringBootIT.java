@@ -1,5 +1,8 @@
 package com.ocarlsen.logging.http.client.spring;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
@@ -18,6 +21,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -26,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
@@ -35,12 +40,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -91,7 +98,7 @@ public class RequestLoggingInterceptorSpringBootIT {
     @Test
     public void intercept() {
 
-        // TODO: Given, When, Then
+        // Given
         final int requestId = 1234;
         final UriComponents requestUri = UriComponentsBuilder
                 .fromUriString(createUrlWithPort(CONTROLLER_URI))
@@ -108,31 +115,18 @@ public class RequestLoggingInterceptorSpringBootIT {
         requestHeaders.setContentType(TEXT_PLAIN);
         requestHeaders.setContentLength(requestBody.length());
 
+        final HttpStatus expectedResponseStatus = HttpStatus.OK;
+        final String expectedResponseBody = echoController.echo(requestBody, null, requestId);
+        final HttpHeaders expectedResponseHeaders = new HttpHeaders();
+        expectedResponseHeaders.setContentType(APPLICATION_JSON_UTF8);
+        expectedResponseHeaders.setContentLength(expectedResponseBody.length());
+
+        // When
         final HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, requestHeaders);
         final ResponseEntity<String> responseEntity = restTemplate.exchange(requestUri.toUri(), requestMethod,
                 requestEntity, String.class);
 
-        final String responseBody = echoController.echo(requestBody, requestId);
-        final HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setContentType(APPLICATION_JSON_UTF8);
-        responseHeaders.setContentLength(responseBody.length());
-
-        final HttpStatus responseStatus = responseEntity.getStatusCode();
-        assertThat(responseStatus, is(HttpStatus.OK));
-
-        // Make sure request not consumed by interceptor.
-        final String actualRequestBody = requestEntity.getBody();
-        assertThat(actualRequestBody, is(requestBody));
-
-        // Make sure response not consumed by interceptor.
-        final String actualResponseBody = responseEntity.getBody();
-        assertThat(actualResponseBody, is(responseBody));
-
-        final HttpHeaders actualHeaders = responseEntity.getHeaders();
-        for (final Map.Entry<String, List<String>> entry : responseHeaders.entrySet()) {
-            assertThat(actualHeaders, hasEntry(entry.getKey(), entry.getValue()));
-        }
-
+        // Then
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         final InOrder inOrder = inOrder(logger);
         inOrder.verify(logger).debug("Method  : {}", requestMethod.name());
@@ -140,60 +134,51 @@ public class RequestLoggingInterceptorSpringBootIT {
         inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(requestHeaders)));
         inOrder.verify(logger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();
+
+        // Confidence checks
+        final HttpHeaders actualRequestHeaders = echoController.getRequestHeaders();
+        assertThat(actualRequestHeaders, containsHttpHeaders(requestHeaders));
+
+        final HttpStatus responseStatus = responseEntity.getStatusCode();
+        assertThat(responseStatus, is(expectedResponseStatus));
+
+        final String responseBody = responseEntity.getBody();
+        assertThat(responseBody, is(expectedResponseBody));
+
+        final HttpHeaders responseHeaders = responseEntity.getHeaders();
+        assertThat(responseHeaders, containsHttpHeaders(expectedResponseHeaders));
     }
 
-    @SuppressWarnings("SameParameterValue")
     // TODO: Factor out, this is duplicated
-    private String createUrlWithPort(final String path) {
-        return "http://localhost:" + serverPort + path;
-    }
+    @SuppressWarnings("SameParameterValue")
+    private static Matcher<HttpHeaders> containsHttpHeaders(final HttpHeaders httpHeaders) {
+        return new BaseMatcher<>() {
 
-    @Controller
-    static class EchoController {
+            @Override
+            public boolean matches(final Object actual) {
+                if (actual instanceof HttpHeaders) {
+                    final HttpHeaders actualHttpHeaders = (HttpHeaders) actual;
 
-        @SuppressWarnings("unused")
-        @PostMapping(
-                value = CONTROLLER_URI,
-                consumes = TEXT_PLAIN_VALUE,
-                produces = APPLICATION_JSON_VALUE)
-        @ResponseBody  // Without this, we get 404
-        public String echo(@RequestBody final String body,
-                           @RequestParam(ID) final Integer id) {
-            return String.format("{\"%s\":\"%s\", \"%s\": %d}", BODY, body, ID, id);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    @Configuration
-    @EnableAutoConfiguration
-    static class Config {
-
-        @Bean
-        EchoController echoController() {
-            return new EchoController();
-        }
-
-        @Bean
-        RestTemplate restTemplate() {
-            final RestTemplate restTemplate = new RestTemplate();
-
-            // Make sure buffering enabled.
-            final ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
-            final SimpleClientHttpRequestFactory simpleRequestFactory = (SimpleClientHttpRequestFactory) requestFactory;
-            simpleRequestFactory.setBufferRequestBody(true);    // Be explicit.
-
-            // Add interceptor under test
-            restTemplate.getInterceptors().add(new RequestLoggingInterceptor());
-
-            // Disable annoying "Accept-Charset" header, interferes with test.
-            for (final HttpMessageConverter<?> converter : restTemplate.getMessageConverters()) {
-                if (converter instanceof StringHttpMessageConverter) {
-                    ((StringHttpMessageConverter) converter).setWriteAcceptCharset(false);
+                    for (final Map.Entry<String, List<String>> entry : httpHeaders.entrySet()) {
+                        final String headerName = entry.getKey();
+                        assertThat(actualHttpHeaders.containsKey(headerName), is(true));
+                        final List<String> headerValues = httpHeaders.get(headerName);
+                        assertThat(headerValues, is(notNullValue()));
+                        final List<String> actualHeaderValues = actualHttpHeaders.get(headerName);
+                        assertThat(actualHeaderValues, contains(headerValues.toArray()));
+                    }
+                    return true;
                 }
+                return false;
             }
 
-            return restTemplate;
-        }
+            @Override
+            public void describeTo(final Description description) {
+                description.appendText("HttpHeaders to match ")
+                           .appendValue(httpHeaders);
+
+            }
+        };
     }
 
     // TODO: Factor out, this is duplicated.
@@ -210,5 +195,76 @@ public class RequestLoggingInterceptorSpringBootIT {
             }
             return true;
         };
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    // TODO: Factor out, this is duplicated
+    private String createUrlWithPort(final String path) {
+        return "http://localhost:" + serverPort + path;
+    }
+
+    // TODO: Factor out, this is duplicated
+    @Controller
+    static class EchoController {
+
+        private HttpHeaders requestHeaders;
+
+        @SuppressWarnings("unused")
+        @PostMapping(
+                value = CONTROLLER_URI,
+                consumes = TEXT_PLAIN_VALUE,
+                produces = APPLICATION_JSON_VALUE)
+        @ResponseBody  // Without this, we get 404
+        public String echo(@RequestBody final String body,
+                           @RequestHeader final HttpHeaders headers,
+                           @RequestParam(ID) final Integer id) {
+
+            // Keep for confidence check later.
+            this.requestHeaders = headers;
+
+            return format("{\"%s\":\"%s\", \"%s\": %d}", BODY, body, ID, id);
+        }
+
+        public HttpHeaders getRequestHeaders() {
+            return requestHeaders;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @Configuration
+    @EnableAutoConfiguration
+    static class Config {
+
+        @Bean
+        EchoController echoController() {
+            return new EchoController();
+        }
+
+        @Bean
+        RequestLoggingInterceptor loggingInterceptor() {
+            return new RequestLoggingInterceptor();
+        }
+
+        @Bean
+        RestTemplate restTemplate(final ClientHttpRequestInterceptor interceptor) {
+            final RestTemplate restTemplate = new RestTemplate();
+
+            // Make sure buffering enabled.
+            final ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
+            final SimpleClientHttpRequestFactory simpleRequestFactory = (SimpleClientHttpRequestFactory) requestFactory;
+            simpleRequestFactory.setBufferRequestBody(true);    // Be explicit.
+
+            // Add interceptor under test
+            restTemplate.getInterceptors().add(interceptor);
+
+            // Disable annoying "Accept-Charset" header, interferes with test.
+            for (final HttpMessageConverter<?> converter : restTemplate.getMessageConverters()) {
+                if (converter instanceof StringHttpMessageConverter) {
+                    ((StringHttpMessageConverter) converter).setWriteAcceptCharset(false);
+                }
+            }
+
+            return restTemplate;
+        }
     }
 }

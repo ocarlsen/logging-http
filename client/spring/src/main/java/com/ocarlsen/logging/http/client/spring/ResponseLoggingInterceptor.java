@@ -21,8 +21,8 @@ public class ResponseLoggingInterceptor implements ClientHttpRequestInterceptor 
     private static final Logger LOGGER = LoggerFactory.getLogger(lookup().lookupClass());
 
     @Override
-    public ClientHttpResponse intercept(final HttpRequest request, final byte[] body, final ClientHttpRequestExecution execution) throws IOException {
-
+    public ClientHttpResponse intercept(final HttpRequest request, final byte[] body, final ClientHttpRequestExecution execution)
+            throws IOException {
         final ClientHttpResponse response = execution.execute(request, body);
         logResponse(response);
         return response;
