@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -17,10 +16,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHttpHeadersIgnoringCase;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -66,7 +64,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method.name());
         verify(logger).debug("URL     : {}", uri.toString());
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHttpHeadersIgnoringCase(headers)));
         verify(logger).debug("Body    : [{}]", bodyText);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -113,7 +111,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method.name());
         verify(logger).debug("URL     : {}", uri.toString());
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHttpHeadersIgnoringCase(headers)));
         verify(logger).debug("Body    : [{}]", bodyText);
         reset(logger);
 
@@ -125,19 +123,4 @@ public class RequestLoggingInterceptorTest {
         verifyNoMoreInteractions(request, execution);
     }
 
-    // TODO: Factor out, this is duplicated.
-    private ArgumentMatcher<String> containsHeaders(final HttpHeaders headers) {
-        return argument -> {
-
-            // Convert Map.Entry to string and search ignoring case.
-            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                final String headerPair = entry.toString();
-                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
-                if (!matches) {
-                    return false;
-                }
-            }
-            return true;
-        };
-    }
 }

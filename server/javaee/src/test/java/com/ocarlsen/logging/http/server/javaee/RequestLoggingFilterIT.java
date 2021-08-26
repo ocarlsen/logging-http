@@ -1,11 +1,7 @@
 package com.ocarlsen.logging.http.server.javaee;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,17 +30,13 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
-import java.util.Map;
-
 import static com.ocarlsen.logging.LogLevel.DEBUG;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHttpHeadersIgnoringCase;
+import static com.ocarlsen.logging.http.HeaderMatchers.containsHttpHeaders;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -130,7 +122,7 @@ public class RequestLoggingFilterIT {
         inOrder.verify(logger).debug("Starting {} (logLevel={})", "RequestLoggingFilter", DEBUG);
         inOrder.verify(logger).debug("Method  : {}", requestMethod.name());
         inOrder.verify(logger).debug("URL     : {}", requestUri.toString());
-        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(requestHeaders)));
+        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHttpHeadersIgnoringCase(requestHeaders)));
         inOrder.verify(logger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();
 
@@ -146,54 +138,6 @@ public class RequestLoggingFilterIT {
 
         final HttpHeaders responseHeaders = responseEntity.getHeaders();
         assertThat(responseHeaders, containsHttpHeaders(expectedResponseHeaders));
-    }
-
-    // TODO: Factor out, this is duplicated
-    @SuppressWarnings("SameParameterValue")
-    private static Matcher<HttpHeaders> containsHttpHeaders(final HttpHeaders httpHeaders) {
-        return new BaseMatcher<>() {
-
-            @Override
-            public boolean matches(final Object actual) {
-                if (actual instanceof HttpHeaders) {
-                    final HttpHeaders actualHttpHeaders = (HttpHeaders) actual;
-
-                    for (final Map.Entry<String, List<String>> entry : httpHeaders.entrySet()) {
-                        final String headerName = entry.getKey();
-                        assertThat(actualHttpHeaders.containsKey(headerName), is(true));
-                        final List<String> headerValues = httpHeaders.get(headerName);
-                        assertThat(headerValues, is(notNullValue()));
-                        final List<String> actualHeaderValues = actualHttpHeaders.get(headerName);
-                        assertThat(actualHeaderValues, contains(headerValues.toArray()));
-                    }
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void describeTo(final Description description) {
-                description.appendText("HttpHeaders to match ")
-                           .appendValue(httpHeaders);
-
-            }
-        };
-    }
-
-    // TODO: Factor out, this is duplicated.
-    private ArgumentMatcher<String> containsHeaders(final HttpHeaders headers) {
-        return argument -> {
-
-            // Convert Map.Entry to string and search ignoring case.
-            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                final String headerPair = entry.toString();
-                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
-                if (!matches) {
-                    return false;
-                }
-            }
-            return true;
-        };
     }
 
     @SuppressWarnings("SameParameterValue")

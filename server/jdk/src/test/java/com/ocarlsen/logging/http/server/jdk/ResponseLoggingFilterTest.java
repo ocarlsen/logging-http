@@ -7,7 +7,6 @@ import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,12 +15,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
-import java.util.Map;
 
 import static com.ocarlsen.logging.LogLevel.DEBUG;
 import static com.ocarlsen.logging.LogLevel.INFO;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHeadersIgnoringCase;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -91,7 +89,7 @@ public class ResponseLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
         verify(logger).debug("Status  : {}", responseCode);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
         verify(logger).debug("Body    : [{}]", responseBody);
 
         // Make sure response not consumed by filter.
@@ -144,7 +142,7 @@ public class ResponseLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
         verify(logger).info("Status  : {}", responseCode);
-        verify(logger).info(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).info(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
         verify(logger).info("Body    : [{}]", responseBody);
 
         // Make sure response not consumed by filter.
@@ -158,21 +156,5 @@ public class ResponseLoggingFilterTest {
         verify(httpExchange).getResponseHeaders();
         verify(httpExchange).setStreams(eq(inputStream), isA(CachingOutputStream.class));
         verify(chain).doFilter(httpExchange);
-    }
-
-    // TODO: Factor out, this is duplicated.
-    private ArgumentMatcher<String> containsHeaders(final Headers headers) {
-        return argument -> {
-
-            // Convert Map.Entry to string and search ignoring case.
-            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                final String headerPair = entry.toString();
-                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
-                if (!matches) {
-                    return false;
-                }
-            }
-            return true;
-        };
     }
 }

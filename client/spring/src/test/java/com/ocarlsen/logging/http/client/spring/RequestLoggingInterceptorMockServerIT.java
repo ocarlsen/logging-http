@@ -3,7 +3,6 @@ package com.ocarlsen.logging.http.client.spring;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +23,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
-import java.util.Map;
-
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHttpHeadersIgnoringCase;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -105,7 +101,7 @@ public class RequestLoggingInterceptorMockServerIT {
         final InOrder inOrder = inOrder(logger);
         inOrder.verify(logger).debug("Method  : {}", requestMethod.name());
         inOrder.verify(logger).debug("URL     : {}", requestUri.toUri().toString());
-        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(requestHeaders)));
+        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHttpHeadersIgnoringCase(requestHeaders)));
         inOrder.verify(logger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();
 
@@ -148,21 +144,5 @@ public class RequestLoggingInterceptorMockServerIT {
 
             return restTemplate;
         }
-    }
-
-    // TODO: Factor out, this is duplicated.
-    private ArgumentMatcher<String> containsHeaders(final HttpHeaders headers) {
-        return argument -> {
-
-            // Convert Map.Entry to string and search ignoring case.
-            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                final String headerPair = entry.toString();
-                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
-                if (!matches) {
-                    return false;
-                }
-            }
-            return true;
-        };
     }
 }

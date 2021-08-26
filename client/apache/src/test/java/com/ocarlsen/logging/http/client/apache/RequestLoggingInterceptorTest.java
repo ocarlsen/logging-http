@@ -5,7 +5,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.RequestLine;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.entity.GzipDecompressingEntity;
@@ -19,14 +18,11 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHeadersIgnoringCase;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -37,7 +33,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 @RunWith(Theories.class)
 public class RequestLoggingInterceptorTest {
@@ -69,7 +64,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
         verify(logger).debug("URL     : {}", uri);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
         verify(logger).debug("Body    : [{}]", "");
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -97,7 +92,7 @@ public class RequestLoggingInterceptorTest {
         httpRequest.setEntity(entityIn);
 
         // Prepare mocks
-         final HttpContext httpContext = mock(HttpContext.class);
+        final HttpContext httpContext = mock(HttpContext.class);
 
         // When
         requestInterceptor.process(httpRequest, httpContext);
@@ -106,7 +101,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
         verify(logger).debug("URL     : {}", uri);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -155,7 +150,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
         verify(logger).debug("URL     : {}", uri);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -199,7 +194,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
         verify(logger).debug("URL     : {}", uri);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -217,21 +212,4 @@ public class RequestLoggingInterceptorTest {
         verifyNoMoreInteractions(httpContext);
     }
 
-    // TODO: Factor out, this is duplicated.
-    private ArgumentMatcher<String> containsHeaders(final Header[] headers) {
-        return argument -> {
-
-            // Convert to string and search ignoring case.
-            for (final Header header : headers) {
-                final String headerName = header.getName();
-                final String headerValue = header.getValue();
-                final String headerPair = String.format("%s=[%s]", headerName, headerValue);
-                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
-                if (!matches) {
-                    return false;
-                }
-            }
-            return true;
-        };
-    }
 }

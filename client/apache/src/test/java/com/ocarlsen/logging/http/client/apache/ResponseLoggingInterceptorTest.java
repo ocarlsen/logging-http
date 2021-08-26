@@ -19,15 +19,12 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
-import java.util.List;
-
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHeadersIgnoringCase;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -86,7 +83,7 @@ public class ResponseLoggingInterceptorTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         verify(logger).debug("Status  : {}", statusCode);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -142,7 +139,7 @@ public class ResponseLoggingInterceptorTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         verify(logger).debug("Status  : {}", statusCode);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -193,7 +190,7 @@ public class ResponseLoggingInterceptorTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         verify(logger).debug("Status  : {}", statusCode);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeaders(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -212,23 +209,5 @@ public class ResponseLoggingInterceptorTest {
         verify(statusLine, times(2)).getStatusCode();
         verify(statusLine).getReasonPhrase();
         verifyNoMoreInteractions(statusLine, httpContext);
-    }
-
-    // TODO: Factor out, this is duplicated.
-    private ArgumentMatcher<String> containsHeaders(final Header[] headers) {
-        return argument -> {
-
-            // Convert to string and search ignoring case.
-            for (final Header header : headers) {
-                final String headerName = header.getName();
-                final String headerValue = header.getValue();
-                final String headerPair = String.format("%s=[%s]", headerName, headerValue);
-                final boolean matches = containsStringIgnoringCase(headerPair).matches(argument);
-                if (!matches) {
-                    return false;
-                }
-            }
-            return true;
-        };
     }
 }

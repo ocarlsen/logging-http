@@ -19,14 +19,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,17 +31,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHeaderIgnoringCase;
+import static com.ocarlsen.logging.http.HeaderMatchers.containsHeader;
+import static com.ocarlsen.logging.http.HeaderMatchers.containsHeaders;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
-import static org.hamcrest.CoreMatchers.hasItem;
+import static org.apache.http.HttpHeaders.CONTENT_LENGTH;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
@@ -116,13 +114,14 @@ public class ResponseLoggingFilterIT {
             // Then
             final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
             verify(logger).debug("Status  : {}", expectedResponseStatus);
-            verify(logger).debug(eq("Headers : {}"), argThat(containsHeader("content-length", String.valueOf(expectedResponseBody.length()))));
+            verify(logger).debug(eq("Headers : {}"), argThat(
+                    containsHeaderIgnoringCase(CONTENT_LENGTH, String.valueOf(expectedResponseBody.length()))));
             verify(logger).debug("Body    : [{}]", expectedResponseBody);
             reset(logger);
 
             // Confidence checks
             final Headers actualRequestHeaders = echoHandler.getRequestHeaders();
-            assertThat(actualRequestHeaders, containsHeadersMatching(requestHeaders));
+            assertThat(actualRequestHeaders, containsHeaders(requestHeaders));
 
             final int responseStatus = response.getStatusLine().getStatusCode();
             assertThat(responseStatus, is(expectedResponseStatus));
@@ -132,7 +131,7 @@ public class ResponseLoggingFilterIT {
             assertThat(responseBody, is(expectedResponseBody));
 
             final List<Header> actualResponseHeaders = asList(response.getAllHeaders());
-            assertThat(actualResponseHeaders, hasItem(aHeaderMatching("content-length", String.valueOf(responseBody.length()))));
+            assertThat(actualResponseHeaders, hasItem(containsHeader(CONTENT_LENGTH, String.valueOf(responseBody.length()))));
         }
     }
 
@@ -170,13 +169,13 @@ public class ResponseLoggingFilterIT {
             final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
             verify(logger).debug("Status  : {}", expectedResponseStatus);
             verify(logger).debug(eq("Headers : {}"), argThat(
-                    containsHeader("content-length", String.valueOf(expectedResponseBody.length()))));
+                    containsHeaderIgnoringCase(CONTENT_LENGTH, String.valueOf(expectedResponseBody.length()))));
             verify(logger).debug("Body    : [{}]", expectedResponseBody);
             reset(logger);
 
             // Confidence checks
             final Headers actualRequestHeaders = echoHandler.getRequestHeaders();
-            assertThat(actualRequestHeaders, containsHeadersMatching(requestHeaders));
+            assertThat(actualRequestHeaders, containsHeaders(requestHeaders));
 
             final int responseStatus = response.getStatusLine().getStatusCode();
             assertThat(responseStatus, is(expectedResponseStatus));
@@ -186,76 +185,8 @@ public class ResponseLoggingFilterIT {
             assertThat(responseBody, is(expectedResponseBody));
 
             final List<Header> actualResponseHeaders = asList(response.getAllHeaders());
-            assertThat(actualResponseHeaders, hasItem(aHeaderMatching("content-length", String.valueOf(responseBody.length()))));
+            assertThat(actualResponseHeaders, hasItem(containsHeader(CONTENT_LENGTH, String.valueOf(responseBody.length()))));
         }
-    }
-
-    // TODO: Factor out, this is duplicated
-    @SuppressWarnings("SameParameterValue")
-    private static Matcher<Header> aHeaderMatching(final String headerName, final String headerValue) {
-        return new BaseMatcher<>() {
-
-            @Override
-            public boolean matches(final Object actual) {
-                if (actual instanceof Header) {
-                    final Header header = (Header) actual;
-                    return (header.getName().equalsIgnoreCase(headerName) &&
-                            header.getValue().equals(headerValue));
-                }
-                return false;
-            }
-
-            @Override
-            public void describeTo(final Description description) {
-                description.appendText("a header with name ")
-                           .appendValue(headerName)
-                           .appendText(" and value ")
-                           .appendValue(headerValue);
-
-            }
-        };
-    }
-
-    // TODO: Factor out, this is duplicated
-    private static Matcher<Headers> containsHeadersMatching(final Header[] headers) {
-        return new BaseMatcher<>() {
-
-            @Override
-            public boolean matches(final Object actual) {
-                if (actual instanceof Headers) {
-                    final Headers actualHeaders = (Headers) actual;
-
-                    for (final Header header : headers) {
-                        final String headerName = header.getName();
-                        assertThat(actualHeaders.containsKey(headerName), is(true));
-                        final List<String> actualHeaderValues = actualHeaders.get(headerName);
-                        final String headerValue = header.getValue();
-                        assertThat(actualHeaderValues.get(0), is(headerValue));
-                    }
-
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void describeTo(final Description description) {
-                description.appendText("Headers to match ")
-                           .appendValue(Arrays.asList(headers));
-
-            }
-        };
-    }
-
-    // TODO: Factor out, this is duplicated.
-    @SuppressWarnings("SameParameterValue")
-    private ArgumentMatcher<String> containsHeader(final String headerName, final String headerValue) {
-        return argument -> {
-
-            // Convert to string and search ignoring case.
-            final String headerPair = format("%s=[%s]", headerName, headerValue);
-            return containsStringIgnoringCase(headerPair).matches(argument);
-        };
     }
 
     private static class EchoHandler implements HttpHandler {
