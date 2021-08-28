@@ -31,7 +31,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import static com.ocarlsen.logging.LogLevel.DEBUG;
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHttpHeadersIgnoringCase;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.matchesHttpHeaders;
 import static com.ocarlsen.logging.http.HeaderMatchers.containsHttpHeaders;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -120,7 +120,7 @@ public class ResponseLoggingFilterIT {
         final InOrder inOrder = inOrder(logger);
         inOrder.verify(logger).debug("Starting {} (logLevel={})", "ResponseLoggingFilter", DEBUG);
         inOrder.verify(logger).debug("Status  : {}", expectedResponseStatus.value());
-        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHttpHeadersIgnoringCase(expectedResponseHeaders)));
+        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(matchesHttpHeaders(expectedResponseHeaders)));
         inOrder.verify(logger).debug("Body    : [{}]", expectedResponseBody);
         inOrder.verifyNoMoreInteractions();
 

@@ -34,7 +34,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHeaderIgnoringCase;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.matchesHeader;
 import static com.ocarlsen.logging.http.HeaderMatchers.containsHeader;
 import static com.ocarlsen.logging.http.HeaderMatchers.containsHeaders;
 import static java.lang.String.format;
@@ -114,8 +114,8 @@ public class ResponseLoggingFilterIT {
             // Then
             final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
             verify(logger).debug("Status  : {}", expectedResponseStatus);
-            verify(logger).debug(eq("Headers : {}"), argThat(
-                    containsHeaderIgnoringCase(CONTENT_LENGTH, String.valueOf(expectedResponseBody.length()))));
+            verify(logger).debug(eq("Headers : {}"), argThat(matchesHeader(CONTENT_LENGTH,
+                    String.valueOf(expectedResponseBody.length()))));
             verify(logger).debug("Body    : [{}]", expectedResponseBody);
             reset(logger);
 
@@ -131,7 +131,8 @@ public class ResponseLoggingFilterIT {
             assertThat(responseBody, is(expectedResponseBody));
 
             final List<Header> actualResponseHeaders = asList(response.getAllHeaders());
-            assertThat(actualResponseHeaders, hasItem(containsHeader(CONTENT_LENGTH, String.valueOf(responseBody.length()))));
+            assertThat(actualResponseHeaders, hasItem(containsHeader(CONTENT_LENGTH,
+                    String.valueOf(responseBody.length()))));
         }
     }
 
@@ -168,8 +169,8 @@ public class ResponseLoggingFilterIT {
             // Then
             final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
             verify(logger).debug("Status  : {}", expectedResponseStatus);
-            verify(logger).debug(eq("Headers : {}"), argThat(
-                    containsHeaderIgnoringCase(CONTENT_LENGTH, String.valueOf(expectedResponseBody.length()))));
+            verify(logger).debug(eq("Headers : {}"), argThat(matchesHeader(CONTENT_LENGTH,
+                    String.valueOf(expectedResponseBody.length()))));
             verify(logger).debug("Body    : [{}]", expectedResponseBody);
             reset(logger);
 
@@ -185,7 +186,8 @@ public class ResponseLoggingFilterIT {
             assertThat(responseBody, is(expectedResponseBody));
 
             final List<Header> actualResponseHeaders = asList(response.getAllHeaders());
-            assertThat(actualResponseHeaders, hasItem(containsHeader(CONTENT_LENGTH, String.valueOf(responseBody.length()))));
+            assertThat(actualResponseHeaders, hasItem(containsHeader(CONTENT_LENGTH,
+                    String.valueOf(responseBody.length()))));
         }
     }
 

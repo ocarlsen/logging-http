@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHttpHeadersIgnoringCase;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.matchesHttpHeaders;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -63,7 +63,7 @@ public class ResponseLoggingInterceptorTest {
         assertThat(actualResponse, is(sameInstance(response)));
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         verify(logger).debug("Status  : {}", statusCode.value());
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHttpHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(matchesHttpHeaders(headers)));
         verify(logger).debug("Body    : [{}]", responseBodyText);
         reset(logger);
 

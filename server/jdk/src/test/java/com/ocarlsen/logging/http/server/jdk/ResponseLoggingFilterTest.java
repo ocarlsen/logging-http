@@ -18,7 +18,7 @@ import java.util.List;
 
 import static com.ocarlsen.logging.LogLevel.DEBUG;
 import static com.ocarlsen.logging.LogLevel.INFO;
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHeadersIgnoringCase;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.matchesHeaders;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -89,7 +89,7 @@ public class ResponseLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
         verify(logger).debug("Status  : {}", responseCode);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(matchesHeaders(headers)));
         verify(logger).debug("Body    : [{}]", responseBody);
 
         // Make sure response not consumed by filter.
@@ -142,7 +142,7 @@ public class ResponseLoggingFilterTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingFilter.class);
         verify(logger).info("Status  : {}", responseCode);
-        verify(logger).info(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
+        verify(logger).info(eq("Headers : {}"), argThat(matchesHeaders(headers)));
         verify(logger).info("Body    : [{}]", responseBody);
 
         // Make sure response not consumed by filter.

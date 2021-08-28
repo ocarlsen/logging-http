@@ -1,6 +1,7 @@
 package com.ocarlsen.logging.http.client.apache;
 
 import com.ocarlsen.logging.http.GzipContentEnablingEntity;
+import com.ocarlsen.logging.http.HeaderArgumentMatchers;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -23,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHeadersIgnoringCase;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -83,7 +83,7 @@ public class ResponseLoggingInterceptorTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         verify(logger).debug("Status  : {}", statusCode);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(HeaderArgumentMatchers.matchesHeaderArray(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -139,7 +139,7 @@ public class ResponseLoggingInterceptorTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         verify(logger).debug("Status  : {}", statusCode);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(HeaderArgumentMatchers.matchesHeaderArray(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -190,7 +190,7 @@ public class ResponseLoggingInterceptorTest {
         // Then
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         verify(logger).debug("Status  : {}", statusCode);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(HeaderArgumentMatchers.matchesHeaderArray(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);

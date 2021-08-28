@@ -1,5 +1,6 @@
 package com.ocarlsen.logging.http.server.jdk;
 
+import com.ocarlsen.logging.http.HeaderArgumentMatchers;
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpContext;
@@ -34,7 +35,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHeadersIgnoringCase;
 import static com.ocarlsen.logging.http.HeaderMatchers.containsHeader;
 import static com.ocarlsen.logging.http.HeaderMatchers.containsHeaders;
 import static java.lang.String.format;
@@ -113,7 +113,7 @@ public class RequestLoggingFilterIT {
             final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
             verify(logger).debug("Method  : {}", httpGet.getMethod());
             verify(logger).debug("URL     : {}", uri);
-            verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(requestHeaders)));
+            verify(logger).debug(eq("Headers : {}"), argThat(HeaderArgumentMatchers.matchesHeaderArray(requestHeaders)));
             verify(logger).debug("Body    : [{}]", "");
             reset(logger);
 
@@ -164,7 +164,7 @@ public class RequestLoggingFilterIT {
             final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
             verify(logger).debug("Method  : {}", httpPost.getMethod());
             verify(logger).debug("URL     : {}", uri);
-            verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(requestHeaders)));
+            verify(logger).debug(eq("Headers : {}"), argThat(HeaderArgumentMatchers.matchesHeaderArray(requestHeaders)));
             verify(logger).debug("Body    : [{}]", requestBodyText);
             reset(logger);
 
@@ -216,7 +216,7 @@ public class RequestLoggingFilterIT {
             final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
             verify(logger).debug("Method  : {}", httpPost.getMethod());
             verify(logger).debug("URL     : {}", uri);
-            verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(requestHeaders)));
+            verify(logger).debug(eq("Headers : {}"), argThat(HeaderArgumentMatchers.matchesHeaderArray(requestHeaders)));
             verify(logger).debug("Body    : [{}]", requestBodyText);
             reset(logger);
 

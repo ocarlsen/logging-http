@@ -23,7 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHttpHeadersIgnoringCase;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.matchesHttpHeaders;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -100,7 +100,7 @@ public class ResponseLoggingInterceptorMockServerIT {
         final Logger logger = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
         final InOrder inOrder = inOrder(logger);
         inOrder.verify(logger).debug("Status  : {}", responseStatus.value());
-        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHttpHeadersIgnoringCase(responseHeaders)));
+        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(matchesHttpHeaders(responseHeaders)));
         inOrder.verify(logger).debug("Body    : [{}]", responseBody);
         inOrder.verifyNoMoreInteractions();
 

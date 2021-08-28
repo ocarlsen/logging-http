@@ -1,6 +1,7 @@
 package com.ocarlsen.logging.http.client.apache;
 
 import com.ocarlsen.logging.http.GzipContentEnablingEntity;
+import com.ocarlsen.logging.http.HeaderArgumentMatchers;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -21,7 +22,6 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHeadersIgnoringCase;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -64,7 +64,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
         verify(logger).debug("URL     : {}", uri);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(HeaderArgumentMatchers.matchesHeaderArray(headers)));
         verify(logger).debug("Body    : [{}]", "");
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -101,7 +101,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
         verify(logger).debug("URL     : {}", uri);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(HeaderArgumentMatchers.matchesHeaderArray(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -150,7 +150,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
         verify(logger).debug("URL     : {}", uri);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(HeaderArgumentMatchers.matchesHeaderArray(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -194,7 +194,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method);
         verify(logger).debug("URL     : {}", uri);
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(HeaderArgumentMatchers.matchesHeaderArray(headers)));
         verify(logger).debug("Body    : [{}]", bodyIn);
         verifyNoMoreInteractions(logger);
         reset(logger);

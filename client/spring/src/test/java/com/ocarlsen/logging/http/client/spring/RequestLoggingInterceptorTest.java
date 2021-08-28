@@ -17,7 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHttpHeadersIgnoringCase;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.matchesHttpHeaders;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -64,7 +64,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method.name());
         verify(logger).debug("URL     : {}", uri.toString());
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHttpHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(matchesHttpHeaders(headers)));
         verify(logger).debug("Body    : [{}]", bodyText);
         verifyNoMoreInteractions(logger);
         reset(logger);
@@ -111,7 +111,7 @@ public class RequestLoggingInterceptorTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
         verify(logger).debug("Method  : {}", method.name());
         verify(logger).debug("URL     : {}", uri.toString());
-        verify(logger).debug(eq("Headers : {}"), argThat(containsHttpHeadersIgnoringCase(headers)));
+        verify(logger).debug(eq("Headers : {}"), argThat(matchesHttpHeaders(headers)));
         verify(logger).debug("Body    : [{}]", bodyText);
         reset(logger);
 

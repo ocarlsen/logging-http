@@ -33,7 +33,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.containsHttpHeadersIgnoringCase;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.matchesHttpHeaders;
 import static com.ocarlsen.logging.http.HeaderMatchers.containsHttpHeaders;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -123,7 +123,7 @@ public class RequestLoggingInterceptorSpringBootIT {
         final InOrder inOrder = inOrder(logger);
         inOrder.verify(logger).debug("Method  : {}", requestMethod.name());
         inOrder.verify(logger).debug("URL     : {}", requestUri.toUri().toString());
-        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(containsHttpHeadersIgnoringCase(requestHeaders)));
+        inOrder.verify(logger).debug(eq("Headers : {}"), argThat(matchesHttpHeaders(requestHeaders)));
         inOrder.verify(logger).debug("Body    : [{}]", requestBody);
         inOrder.verifyNoMoreInteractions();
 
