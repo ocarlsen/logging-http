@@ -35,15 +35,14 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.ocarlsen.logging.http.HeaderArgumentMatchers.matchesHeader;
-import static com.ocarlsen.logging.http.HeaderMatchers.containsHeader;
 import static com.ocarlsen.logging.http.HeaderMatchers.containsHeaders;
+import static com.ocarlsen.logging.http.HeaderMatchers.containsHeader;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Arrays.asList;
 import static org.apache.http.HttpHeaders.CONTENT_LENGTH;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItemInArray;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
@@ -130,9 +129,8 @@ public class ResponseLoggingFilterIT {
             final String responseBody = EntityUtils.toString(responseEntity);
             assertThat(responseBody, is(expectedResponseBody));
 
-            final List<Header> actualResponseHeaders = asList(response.getAllHeaders());
-            assertThat(actualResponseHeaders, hasItem(containsHeader(CONTENT_LENGTH,
-                    String.valueOf(responseBody.length()))));
+            final Header[] actualResponseHeaders = response.getAllHeaders();
+            assertThat(actualResponseHeaders, hasItemInArray(containsHeader(CONTENT_LENGTH, String.valueOf(responseBody.length()))));
         }
     }
 
@@ -185,9 +183,8 @@ public class ResponseLoggingFilterIT {
             final String responseBody = EntityUtils.toString(responseEntity);
             assertThat(responseBody, is(expectedResponseBody));
 
-            final List<Header> actualResponseHeaders = asList(response.getAllHeaders());
-            assertThat(actualResponseHeaders, hasItem(containsHeader(CONTENT_LENGTH,
-                    String.valueOf(responseBody.length()))));
+            final Header[] actualResponseHeaders = response.getAllHeaders();
+            assertThat(actualResponseHeaders, hasItemInArray(containsHeader(CONTENT_LENGTH, String.valueOf(responseBody.length()))));
         }
     }
 

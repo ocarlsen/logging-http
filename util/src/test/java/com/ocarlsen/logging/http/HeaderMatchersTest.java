@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 
 import java.util.List;
 
+import static com.ocarlsen.logging.http.HeaderMatchers.containsHeader;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -24,7 +25,7 @@ public class HeaderMatchersTest {
         final String headerValue = "application/json";
 
         // When
-        final Matcher<Header> matcher = HeaderMatchers.containsHeader(headerName, headerValue);
+        final Matcher<Header> matcher = containsHeader(headerName, headerValue);
         final Header headerToMatch = new BasicHeader("content-type", headerValue);     // Case-insensitive header name match works!
         final boolean match = matcher.matches(headerToMatch);
 
@@ -40,7 +41,7 @@ public class HeaderMatchersTest {
         final String headerValue = "APPLICATION/JSON";
 
         // When
-        final Matcher<Header> matcher = HeaderMatchers.containsHeader(headerName, headerValue);
+        final Matcher<Header> matcher = containsHeader(headerName, headerValue);
         final Header headerToMatch = new BasicHeader(headerName, "application/json");     // Case-insensitive header value match does not.
         final boolean match = matcher.matches(headerToMatch);
 
@@ -57,7 +58,7 @@ public class HeaderMatchersTest {
 
         // When
         final Description description = new StringDescription();
-        final Matcher<Header> matcher = HeaderMatchers.containsHeader(headerName, headerValue);
+        final Matcher<Header> matcher = containsHeader(headerName, headerValue);
         matcher.describeTo(description);
 
         // Then
