@@ -32,15 +32,15 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.ocarlsen.test</groupId>
-            <artifactId>mock-slf4j-impl</artifactId>
-        </dependency>
 
         <!-- Test -->
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ocarlsen.test</groupId>
+            <artifactId>mock-slf4j-impl</artifactId>
         </dependency>
     </dependencies>
 

@@ -27,6 +27,10 @@ import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
+/**
+ * Activate the {@code log4j-logger} profile in the pom.xml to use Log4J binding instead of mock-slf4j-impl.
+ * (De-activate the {@code mock-logger} profile to remove SLF4J warnings about multiple bindings.)
+ */
 // TODO: Write ITs for this package.
 public abstract class AbstractLoggingInterceptorTestManual {
 
