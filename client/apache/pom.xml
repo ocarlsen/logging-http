@@ -16,6 +16,20 @@
 
     <profiles>
         <profile>
+            <id>log4j-logger</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <version>${slf4j.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>mock-logger</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -24,20 +38,6 @@
                 <dependency>
                     <groupId>com.ocarlsen.test</groupId>
                     <artifactId>mock-slf4j-impl</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>log4j-logger</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <version>${slf4j.version}</version>
-                    <scope>test</scope>
                 </dependency>
             </dependencies>
         </profile>
