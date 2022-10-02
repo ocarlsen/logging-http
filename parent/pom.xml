@@ -21,10 +21,6 @@
         <apache.httpcore.version>4.4.13</apache.httpcore.version>
         <apache.httpclient.version>4.5.13</apache.httpclient.version>
         <commons-io.version>2.6</commons-io.version>
-
-        <!-- SonarQube -->
-        <sonar.organization>ocarlsen</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencyManagement>
