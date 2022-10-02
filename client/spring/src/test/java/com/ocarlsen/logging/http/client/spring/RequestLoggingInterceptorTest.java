@@ -77,6 +77,48 @@ public class RequestLoggingInterceptorTest {
         verifyNoMoreInteractions(request, execution, response);
     }
 
+    @Test
+    public void intercept_null() throws IOException, URISyntaxException {
+
+        // Given
+        final URI uri = new URI("http://www.ocarlsen.com/path?abc=def");
+        final String bodyText = "hello";
+        final byte[] body = bodyText.getBytes(UTF_8);
+        final RequestLoggingInterceptor interceptor = new RequestLoggingInterceptor();
+
+        // Prepare mocks.
+        final HttpRequest request = mock(HttpRequest.class);
+        final HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Test", "testvalue");
+        headers.addAll("Accept", List.of("application/json", "text/plain"));
+        when(request.getMethod()).thenReturn(null);
+        when(request.getURI()).thenReturn(uri);
+        when(request.getHeaders()).thenReturn(headers);
+        final ClientHttpRequestExecution execution = mock(ClientHttpRequestExecution.class);
+        final ClientHttpResponse response = mock(ClientHttpResponse.class);
+        when(execution.execute(request, body)).thenReturn(response);
+
+        // When
+        final ClientHttpResponse actualResponse = interceptor.intercept(request, body, execution);
+
+        // Then
+        assertThat(actualResponse, is(sameInstance(response)));
+        final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
+        verify(logger).debug("Method  : {}", "");
+        verify(logger).debug("URL     : {}", uri.toString());
+        verify(logger).debug(eq("Headers : {}"), argThat(matchesHttpHeaders(headers)));
+        verify(logger).debug("Body    : [{}]", bodyText);
+        verifyNoMoreInteractions(logger);
+        reset(logger);
+
+        // Verify mocks.
+        verify(request).getMethod();
+        verify(request).getURI();
+        verify(request).getHeaders();
+        verify(execution).execute(request, body);
+        verifyNoMoreInteractions(request, execution, response);
+    }
+
     @SuppressWarnings("UnnecessaryToStringCall")
     @Theory
     @Test
