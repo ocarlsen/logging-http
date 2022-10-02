@@ -9,7 +9,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content="Apache Maven Doxia Site Renderer 1.11.1" />
-    <title>Logging HTTP &#x2013; Dependency Information</title>
+    <title>Logging HTTP Parent &#x2013; Dependency Information</title>
     <link rel="stylesheet" href="./css/maven-base.css" />
     <link rel="stylesheet" href="./css/maven-theme.css" />
     <link rel="stylesheet" href="./css/site.css" />
@@ -17,7 +17,7 @@
   </head>
   <body class="composite">
     <div id="banner">
-<div id="bannerLeft">Logging HTTP
+<div id="bannerLeft">Logging HTTP Parent
 </div>
       <div class="clear">
         <hr/>
@@ -28,31 +28,27 @@
         <span id="publishDate">Last Published: 2022-10-02</span>
            | <span id="projectVersion">Version: 1.0.0</span>
       </div>
-      <div class="xright"><a href="./" title="Logging HTTP">Logging HTTP</a>      </div>
+      <div class="xright"><a href="./" title="Logging HTTP Parent">Logging HTTP Parent</a>      </div>
       <div class="clear">
         <hr/>
       </div>
     </div>
     <div id="leftColumn">
       <div id="navcolumn">
-       <h5>Modules</h5>
+       <h5>Parent Project</h5>
     <ul>
-     <li class="none"><a href="parent/index.html" title="Logging HTTP Parent">Logging HTTP Parent</a></li>
-     <li class="none"><a href="parent/client/index.html" title="Logging HTTP Client">Logging HTTP Client</a></li>
-     <li class="none"><a href="parent/report/index.html" title="report">report</a></li>
-     <li class="none"><a href="parent/server/index.html" title="Logging HTTP Server">Logging HTTP Server</a></li>
-     <li class="none"><a href="parent/util/index.html" title="util">util</a></li>
+     <li class="none"><a href="../index.html" title="Logging HTTP">Logging HTTP</a></li>
     </ul>
        <h5>Project Documentation</h5>
     <ul>
      <li class="expanded"><a href="project-info.html" title="Project Information">Project Information</a>
       <ul>
-       <li class="none"><a href="dependency-convergence.html" title="Dependency Convergence">Dependency Convergence</a></li>
+       <li class="none"><a href="dependencies.html" title="Dependencies">Dependencies</a></li>
        <li class="none"><strong>Dependency Information</strong></li>
+       <li class="none"><a href="dependency-management.html" title="Dependency Management">Dependency Management</a></li>
        <li class="none"><a href="distribution-management.html" title="Distribution Management">Distribution Management</a></li>
        <li class="none"><a href="index.html" title="About">About</a></li>
        <li class="none"><a href="licenses.html" title="Licenses">Licenses</a></li>
-       <li class="none"><a href="modules.html" title="Project Modules">Project Modules</a></li>
        <li class="none"><a href="plugin-management.html" title="Plugin Management">Plugin Management</a></li>
        <li class="none"><a href="plugins.html" title="Plugins">Plugins</a></li>
        <li class="none"><a href="scm.html" title="Source Code Management">Source Code Management</a></li>
@@ -73,32 +69,32 @@
 <div class="source">
 <pre>&lt;dependency&gt;
   &lt;groupId&gt;com.ocarlsen.logging.http&lt;/groupId&gt;
-  &lt;artifactId&gt;logging-http&lt;/artifactId&gt;
+  &lt;artifactId&gt;parent&lt;/artifactId&gt;
   &lt;version&gt;1.0.0&lt;/version&gt;
   &lt;type&gt;pom&lt;/type&gt;
 &lt;/dependency&gt;</pre></div></section><section>
 <h3><a name="Apache_Buildr"></a>Apache Buildr</h3><a name="Apache_Buildr"></a>
 <div class="source">
-<pre>'com.ocarlsen.logging.http:logging-http:pom:1.0.0'</pre></div></section><section>
+<pre>'com.ocarlsen.logging.http:parent:pom:1.0.0'</pre></div></section><section>
 <h3><a name="Apache_Ivy"></a>Apache Ivy</h3><a name="Apache_Ivy"></a>
 <div class="source">
-<pre>&lt;dependency org=&quot;com.ocarlsen.logging.http&quot; name=&quot;logging-http&quot; rev=&quot;1.0.0&quot;&gt;
-  &lt;artifact name=&quot;logging-http&quot; type=&quot;pom&quot; /&gt;
+<pre>&lt;dependency org=&quot;com.ocarlsen.logging.http&quot; name=&quot;parent&quot; rev=&quot;1.0.0&quot;&gt;
+  &lt;artifact name=&quot;parent&quot; type=&quot;pom&quot; /&gt;
 &lt;/dependency&gt;</pre></div></section><section>
 <h3><a name="Groovy_Grape"></a>Groovy Grape</h3><a name="Groovy_Grape"></a>
 <div class="source">
 <pre>@Grapes(
-@Grab(group='com.ocarlsen.logging.http', module='logging-http', version='1.0.0')
+@Grab(group='com.ocarlsen.logging.http', module='parent', version='1.0.0')
 )</pre></div></section><section>
 <h3><a name="Gradle.2FGrails"></a>Gradle/Grails</h3><a name="Gradle.2FGrails"></a>
 <div class="source">
-<pre>compile 'com.ocarlsen.logging.http:logging-http:1.0.0'</pre></div></section><section>
+<pre>compile 'com.ocarlsen.logging.http:parent:1.0.0'</pre></div></section><section>
 <h3><a name="Scala_SBT"></a>Scala SBT</h3><a name="Scala_SBT"></a>
 <div class="source">
-<pre>libraryDependencies += &quot;com.ocarlsen.logging.http&quot; % &quot;logging-http&quot; % &quot;1.0.0&quot;</pre></div></section><section>
+<pre>libraryDependencies += &quot;com.ocarlsen.logging.http&quot; % &quot;parent&quot; % &quot;1.0.0&quot;</pre></div></section><section>
 <h3><a name="Leiningen"></a>Leiningen</h3><a name="Leiningen"></a>
 <div class="source">
-<pre>[com.ocarlsen.logging.http/logging-http &quot;1.0.0&quot;]</pre></div></section></section>
+<pre>[com.ocarlsen.logging.http/parent &quot;1.0.0&quot;]</pre></div></section></section>
       </div>
     </div>
     <div class="clear">
