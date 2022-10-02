@@ -9,6 +9,37 @@
     <packaging>pom</packaging>
 
     <name>Logging HTTP</name>
+    <description>Classes to assist HTTP request/response logging for client and server.</description>
+    <url>https://github.com/ocarlsen/logging-http</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://raw.githubusercontent.com/ocarlsen/slf4j-log-level/develop/LICENSE</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Owen Carlsen</name>
+            <email>ocarlsen@gmail.com</email>
+            <url>https://github.com/ocarlsen</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/ocarlsen/logging-http</connection>
+        <developerConnection>${project.scm.connection}</developerConnection>
+        <url>https://github.com/ocarlsen/logging-http</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <properties>
 
