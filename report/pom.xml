@@ -49,11 +49,6 @@
                 <version>0.8.7</version>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
                         <id>report-aggregate</id>
                         <phase>verify</phase>
                         <goals>
@@ -67,7 +62,6 @@
                                 <dataFileInclude>**/jacoco.exec</dataFileInclude>
                             </dataFileIncludes>
                             <outputDirectory>${project.reporting.outputDirectory}/jacoco-aggregate</outputDirectory>
-                            <includeCurrentProject>true</includeCurrentProject>
                         </configuration>
                     </execution>
                 </executions>
