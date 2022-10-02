@@ -51,6 +51,7 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = ResponseLoggingFilterIT.Config.class)
+@SuppressWarnings("NewClassNamingConvention")
 public class ResponseLoggingFilterIT {
 
     private static final String CONTROLLER_URI = "/response_logging_test";
