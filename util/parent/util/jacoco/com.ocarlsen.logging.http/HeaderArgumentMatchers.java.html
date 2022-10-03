@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HeaderArgumentMatchers.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">util</a> &gt; <a href="index.source.html" class="el_package">com.ocarlsen.logging.http</a> &gt; <span class="el_source">HeaderArgumentMatchers.java</span></div><h1>HeaderArgumentMatchers.java</h1><pre class="source lang-java linenums">package com.ocarlsen.logging.http;
+
+import com.sun.net.httpserver.Headers;
+import org.apache.http.Header;
+import org.mockito.ArgumentMatcher;
+import org.springframework.http.HttpHeaders;
+
+import java.util.List;
+import java.util.Map;
+
+<span class="nc" id="L11">public class HeaderArgumentMatchers {</span>
+
+    /**
+     * Matches the format of {@code Map.Entry&lt;String, List&lt;String&gt;&gt;}.
+     * This is convenient because it is default of {@link Headers}.
+     */
+    @SuppressWarnings(&quot;unused&quot;)
+    private static final String HEADER_PATTERN = &quot;%s=[%s]&quot;;
+
+    public static ArgumentMatcher&lt;String&gt; matchesHeader(final String headerName, final String headerValue) {
+<span class="fc" id="L21">        return argument -&gt; matchesNameValuePair(argument, headerName, List.of(headerValue));</span>
+    }
+
+    public static ArgumentMatcher&lt;String&gt; matchesHttpHeaders(final HttpHeaders httpHeaders) {
+<span class="fc" id="L25">        return argument -&gt; {</span>
+
+            // Convert Map.Entry to name/value pair and match.
+<span class="fc bfc" id="L28" title="All 2 branches covered.">            for (final Map.Entry&lt;String, List&lt;String&gt;&gt; entry : httpHeaders.entrySet()) {</span>
+<span class="fc" id="L29">                final String headerName = entry.getKey();</span>
+<span class="fc" id="L30">                final List&lt;String&gt; headerValues = entry.getValue();</span>
+<span class="fc" id="L31">                final boolean matches = matchesNameValuePair(argument, headerName, headerValues);</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">                if (!matches) {</span>
+<span class="fc" id="L33">                    return false;</span>
+                }
+<span class="fc" id="L35">            }</span>
+<span class="fc" id="L36">            return true;</span>
+        };
+    }
+
+    public static ArgumentMatcher&lt;String&gt; matchesHeaderArray(final Header... headers) {
+<span class="fc" id="L41">        return argument -&gt; {</span>
+
+            // Convert to name/value pair and match.
+<span class="fc bfc" id="L44" title="All 2 branches covered.">            for (final Header header : headers) {</span>
+<span class="fc" id="L45">                final String headerName = header.getName();</span>
+<span class="fc" id="L46">                final String headerValue = header.getValue();</span>
+<span class="fc" id="L47">                final boolean matches = matchesNameValuePair(argument, headerName, List.of(headerValue));</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">                if (!matches) {</span>
+<span class="fc" id="L49">                    return false;</span>
+                }
+            }
+<span class="fc" id="L52">            return true;</span>
+        };
+    }
+
+    public static ArgumentMatcher&lt;String&gt; matchesHeaders(final Headers headers) {
+<span class="fc" id="L57">        return argument -&gt; {</span>
+
+            // Convert Map.Entry to name/value pair and match.
+<span class="fc bfc" id="L60" title="All 2 branches covered.">            for (final Map.Entry&lt;String, List&lt;String&gt;&gt; entry : headers.entrySet()) {</span>
+<span class="fc" id="L61">                final String headerName = entry.getKey();</span>
+<span class="fc" id="L62">                final List&lt;String&gt; headerValues = entry.getValue();</span>
+<span class="fc" id="L63">                final boolean matches = matchesNameValuePair(argument, headerName, headerValues);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">                if (!matches) {</span>
+<span class="fc" id="L65">                    return false;</span>
+                }
+<span class="fc" id="L67">            }</span>
+<span class="fc" id="L68">            return true;</span>
+        };
+    }
+
+    private static boolean matchesNameValuePair(final String argument, final String headerName, final List&lt;String&gt; headerValues) {
+
+        // Check for case-sensitive header value match first.
+<span class="fc" id="L75">        final String headerValueExpression = '=' + headerValues.toString();</span>
+<span class="fc" id="L76">        final int headerValueIndex = argument.indexOf(headerValueExpression);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if (headerValueIndex &lt; 0) {</span>
+<span class="fc" id="L78">            return false;</span>
+        }
+
+        // Now check case-insensitive header name match.
+<span class="fc" id="L82">        final int headerNameLength = headerName.length();</span>
+<span class="fc" id="L83">        return argument.regionMatches(true, headerValueIndex - headerNameLength,</span>
+                headerName, 0, headerNameLength);
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

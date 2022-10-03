@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>CachingHttpServletResponse.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">report</a> &gt; <a href="../index.html" class="el_bundle">server-javaee</a> &gt; <a href="index.source.html" class="el_package">com.ocarlsen.logging.http.server.javaee</a> &gt; <span class="el_source">CachingHttpServletResponse.java</span></div><h1>CachingHttpServletResponse.java</h1><pre class="source lang-java linenums">package com.ocarlsen.logging.http.server.javaee;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+
+public class CachingHttpServletResponse extends HttpServletResponseWrapper {
+
+    private ServletOutputStream outputStream;
+    private PrintWriter writer;
+    private CachingServletOutputStream cachingServletOutputStream;
+
+    public CachingHttpServletResponse(final HttpServletResponse response) {
+<span class="fc" id="L18">        super(response);</span>
+<span class="fc" id="L19">    }</span>
+
+    @Override
+    public ServletOutputStream getOutputStream() throws IOException {
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (writer != null) {</span>
+<span class="fc" id="L24">            throw new IllegalStateException(&quot;getWriter() has already been called on this response.&quot;);</span>
+        }
+
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (outputStream == null) {</span>
+<span class="fc" id="L28">            outputStream = super.getOutputStream();</span>
+<span class="fc" id="L29">            cachingServletOutputStream = new CachingServletOutputStream(outputStream);</span>
+        }
+
+<span class="fc" id="L32">        return cachingServletOutputStream;</span>
+    }
+
+    @Override
+    public PrintWriter getWriter() throws IOException {
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (outputStream != null) {</span>
+<span class="fc" id="L38">            throw new IllegalStateException(&quot;getOutputStream() has already been called on this response.&quot;);</span>
+        }
+
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">        if (writer == null) {</span>
+<span class="fc" id="L42">            final ServletOutputStream outputStream = super.getOutputStream();</span>
+<span class="fc" id="L43">            cachingServletOutputStream = new CachingServletOutputStream(outputStream);</span>
+
+<span class="fc" id="L45">            final OutputStreamWriter outputStreamWriter = getOutputStreamWriter(cachingServletOutputStream);</span>
+<span class="fc" id="L46">            writer = new PrintWriter(outputStreamWriter, true);</span>
+        }
+
+<span class="fc" id="L49">        return writer;</span>
+    }
+
+    @Override
+    public void flushBuffer() throws IOException {
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (writer != null) {</span>
+<span class="fc" id="L55">            writer.flush();</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        } else if (cachingServletOutputStream != null) {</span>
+<span class="fc" id="L57">            cachingServletOutputStream.flush();</span>
+        }
+<span class="fc" id="L59">    }</span>
+
+    public byte[] getCachedContent() {
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (cachingServletOutputStream != null) {</span>
+<span class="fc" id="L63">            return cachingServletOutputStream.getBytes();</span>
+        } else {
+            // Prevent NPEs.
+<span class="fc" id="L66">            return new byte[0];</span>
+        }
+    }
+
+
+    private OutputStreamWriter getOutputStreamWriter(final CachingServletOutputStream outputStream) throws UnsupportedEncodingException {
+<span class="fc" id="L72">        final String characterEncoding = super.getCharacterEncoding();</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (characterEncoding != null) {</span>
+<span class="fc" id="L74">            return new OutputStreamWriter(outputStream, characterEncoding);</span>
+        } else {
+<span class="fc" id="L76">            return new OutputStreamWriter(outputStream);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
