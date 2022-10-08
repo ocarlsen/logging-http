@@ -1,7 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-util,com.ocarlsen.logging.http,HeaderMatchers.new BaseMatcher() {...},8,80,5,5,4,15,5,4,0,4
-util,com.ocarlsen.logging.http,HeaderMatchers,3,16,0,0,1,3,1,3,1,3
-util,com.ocarlsen.logging.http,HeaderArgumentMatchers,3,140,0,14,1,33,1,16,1,9
-util,com.ocarlsen.logging.http,HeaderMatchers.new BaseMatcher() {...},2,44,2,4,1,10,2,4,0,3
-util,com.ocarlsen.logging.http,GzipContentEnablingEntity,0,21,0,0,0,6,0,2,0,2
-util,com.ocarlsen.logging.http,HeaderMatchers.new BaseMatcher() {...},8,58,4,4,4,13,4,3,0,3

@@ -1,3 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Logging HTTP Client Apache,com.ocarlsen.logging.http.client.apache,RequestLoggingInterceptor,2,149,3,11,0,36,3,10,0,6
-Logging HTTP Client Apache,com.ocarlsen.logging.http.client.apache,ResponseLoggingInterceptor,2,135,3,9,0,32,3,9,0,6

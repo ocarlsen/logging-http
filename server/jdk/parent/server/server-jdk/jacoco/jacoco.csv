@@ -1,4 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Logging HTTP Server JDK,com.ocarlsen.logging.http.server.jdk,RequestLoggingFilter,23,150,4,4,5,37,3,10,0,9
-Logging HTTP Server JDK,com.ocarlsen.logging.http.server.jdk,ResponseLoggingFilter,0,91,0,0,0,22,0,8,0,8
-Logging HTTP Server JDK,com.ocarlsen.logging.http.server.jdk,CachingOutputStream,0,38,0,0,0,14,0,5,0,5
