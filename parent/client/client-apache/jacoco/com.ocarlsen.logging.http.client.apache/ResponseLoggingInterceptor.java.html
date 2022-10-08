@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ResponseLoggingInterceptor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Logging HTTP Client Apache</a> &gt; <a href="index.source.html" class="el_package">com.ocarlsen.logging.http.client.apache</a> &gt; <span class="el_source">ResponseLoggingInterceptor.java</span></div><h1>ResponseLoggingInterceptor.java</h1><pre class="source lang-java linenums">package com.ocarlsen.logging.http.client.apache;
+
+import com.ocarlsen.logging.http.GzipContentEnablingEntity;
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.entity.GzipCompressingEntity;
+import org.apache.http.client.entity.GzipDecompressingEntity;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import static java.lang.invoke.MethodHandles.lookup;
+
+<span class="fc" id="L24">public class ResponseLoggingInterceptor implements HttpResponseInterceptor {</span>
+
+<span class="fc" id="L26">    private static final Logger LOGGER = LoggerFactory.getLogger(lookup().lookupClass());</span>
+
+    @Override
+    public void process(final HttpResponse httpResponse, final HttpContext httpContext) throws IOException {
+<span class="fc" id="L30">        logResponse(httpResponse);</span>
+<span class="fc" id="L31">    }</span>
+
+    // TODO: Response/Request logging formatter
+    private void logResponse(final HttpResponse response) throws IOException {
+<span class="fc" id="L35">        LOGGER.debug(&quot;Status  : {}&quot;, response.getStatusLine().getStatusCode());</span>
+
+<span class="fc" id="L37">        final String headersFormatted = formatHeaders(response.getAllHeaders());</span>
+<span class="fc" id="L38">        LOGGER.debug(&quot;Headers : {}&quot;, headersFormatted);</span>
+
+<span class="fc" id="L40">        HttpEntity entity = response.getEntity();</span>
+
+        // TODO: Generalize this, replicate for other clients
+        // Handle content encoding
+<span class="fc" id="L44">        final Header contentEncodingHeader = entity.getContentEncoding();</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (contentEncodingHeader != null) {</span>
+<span class="fc" id="L46">            final HeaderElement[] encodings = contentEncodingHeader.getElements();</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">            for (final HeaderElement encoding : encodings) {</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">                if (encoding.getName().equalsIgnoreCase(&quot;gzip&quot;)) {</span>
+
+                    // In case of GzipCompressingEntity, need to wrap so GzipDecompressingEntity can read content.
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">                    if (entity instanceof GzipCompressingEntity) {</span>
+<span class="fc" id="L52">                        entity = new GzipContentEnablingEntity((GzipCompressingEntity) entity);</span>
+                    }
+
+<span class="fc" id="L55">                    entity = new GzipDecompressingEntity(entity);</span>
+<span class="fc" id="L56">                    break;</span>
+                }
+            }
+        }
+
+<span class="fc" id="L61">        final String body = EntityUtils.toString(entity);</span>
+<span class="fc" id="L62">        LOGGER.debug(&quot;Body    : [{}]&quot;, body);</span>
+
+        // If entity has been consumed, we need to restore.
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (!entity.isRepeatable()) {</span>
+<span class="fc" id="L66">            final HttpEntity repeatableEntity = EntityBuilder.create()</span>
+<span class="fc" id="L67">                                                             .setText(body)</span>
+                                                             // TODO: restore GZIP
+<span class="fc" id="L69">                                                             .build();</span>
+<span class="fc" id="L70">            response.setEntity(repeatableEntity);</span>
+        }
+<span class="fc" id="L72">    }</span>
+
+    // TODO: Factor out, this is duplicated
+    private String formatHeaders(final Header[] headers) {
+<span class="fc" id="L76">        final LinkedHashMap&lt;String, List&lt;String&gt;&gt; headerMap = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        for (final Header header : headers) {</span>
+<span class="fc" id="L78">            final String headerName = header.getName();</span>
+<span class="fc" id="L79">            final String headerValue = header.getValue();</span>
+<span class="fc" id="L80">            final List&lt;String&gt; values = headerMap.computeIfAbsent(headerName, key -&gt; new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L81">            values.add(headerValue);</span>
+        }
+<span class="fc" id="L83">        return headerMap.toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

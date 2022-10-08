@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ResponseLoggingFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Logging HTTP Server JDK</a> &gt; <a href="index.source.html" class="el_package">com.ocarlsen.logging.http.server.jdk</a> &gt; <span class="el_source">ResponseLoggingFilter.java</span></div><h1>ResponseLoggingFilter.java</h1><pre class="source lang-java linenums">package com.ocarlsen.logging.http.server.jdk;
+
+import com.ocarlsen.logging.LogLevel;
+import com.sun.net.httpserver.Filter;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
+import static java.lang.invoke.MethodHandles.lookup;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
+
+<span class="fc" id="L17">public class ResponseLoggingFilter extends Filter {</span>
+
+<span class="fc" id="L19">    private static final Logger LOGGER = LoggerFactory.getLogger(lookup().lookupClass());</span>
+
+<span class="fc" id="L21">    private LogLevel logLevel = LogLevel.DEBUG;</span>
+
+    @Override
+    public void doFilter(final HttpExchange exchange, final Chain chain) throws IOException {
+
+        // Wrap
+<span class="fc" id="L27">        final OutputStream outputStream = exchange.getResponseBody();</span>
+<span class="fc" id="L28">        final CachingOutputStream cachingOutputStream = new CachingOutputStream(outputStream);</span>
+
+<span class="fc" id="L30">        exchange.setStreams(exchange.getRequestBody(), cachingOutputStream);</span>
+
+<span class="fc" id="L32">        chain.doFilter(exchange);</span>
+
+<span class="fc" id="L34">        final int responseCode = exchange.getResponseCode();</span>
+<span class="fc" id="L35">        logLevel.log(LOGGER, &quot;Status  : {}&quot;, responseCode);</span>
+
+<span class="fc" id="L37">        final String headersFormatted = formatHeaders(exchange.getResponseHeaders());</span>
+<span class="fc" id="L38">        logLevel.log(LOGGER, &quot;Headers : {}&quot;, headersFormatted);</span>
+
+<span class="fc" id="L40">        final String body = new String(cachingOutputStream.getBytes(), UTF_8);</span>
+<span class="fc" id="L41">        logLevel.log(LOGGER, &quot;Body    : [{}]&quot;, body);</span>
+<span class="fc" id="L42">    }</span>
+
+    @Override
+    public String description() {
+<span class="fc" id="L46">        return this.getClass().getSimpleName();</span>
+    }
+
+    public LogLevel getLogLevel() {
+<span class="fc" id="L50">        return logLevel;</span>
+    }
+
+    public void setLogLevel(final LogLevel logLevel) {
+<span class="fc" id="L54">        this.logLevel = logLevel;</span>
+<span class="fc" id="L55">    }</span>
+
+    // TODO: Factor out, this is duplicated
+    private String formatHeaders(final Headers headers) {
+<span class="fc" id="L59">        return '{' + headers.entrySet()</span>
+<span class="fc" id="L60">                            .stream()</span>
+<span class="fc" id="L61">                            .map(e -&gt; e.getKey() + &quot;=&quot; + e.getValue())</span>
+<span class="fc" id="L62">                            .collect(joining(&quot;, &quot;)) + '}';</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

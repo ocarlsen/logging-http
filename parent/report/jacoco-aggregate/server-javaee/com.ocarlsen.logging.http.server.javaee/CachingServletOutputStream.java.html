@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>CachingServletOutputStream.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">report</a> &gt; <a href="../index.html" class="el_bundle">server-javaee</a> &gt; <a href="index.source.html" class="el_package">com.ocarlsen.logging.http.server.javaee</a> &gt; <span class="el_source">CachingServletOutputStream.java</span></div><h1>CachingServletOutputStream.java</h1><pre class="source lang-java linenums">package com.ocarlsen.logging.http.server.javaee;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+/**
+ * Basically forwards {@link #write(int)}s to the delegate {@link OutputStream} and copies
+ * the data to the internal {@link ByteArrayOutputStream}.
+ */
+public class CachingServletOutputStream extends ServletOutputStream {
+
+    private final OutputStream outputStream;
+    private final ByteArrayOutputStream cachedOutput;
+
+<span class="fc" id="L18">    public CachingServletOutputStream(final OutputStream outputStream) {</span>
+<span class="fc" id="L19">        this.outputStream = outputStream;</span>
+<span class="fc" id="L20">        this.cachedOutput = new ByteArrayOutputStream();</span>
+<span class="fc" id="L21">    }</span>
+
+    @Override
+    public void write(final int b) throws IOException {
+<span class="fc" id="L25">        outputStream.write(b);</span>
+<span class="fc" id="L26">        cachedOutput.write(b);</span>
+<span class="fc" id="L27">    }</span>
+
+    @Override
+    public void flush() throws IOException {
+<span class="fc" id="L31">        outputStream.flush();</span>
+<span class="fc" id="L32">        cachedOutput.flush();</span>
+<span class="fc" id="L33">    }</span>
+
+    @Override
+    public boolean isReady() {
+<span class="fc" id="L37">        return true;</span>
+    }
+
+    @Override
+    public void setWriteListener(final WriteListener readListener) {
+<span class="fc" id="L42">        throw new UnsupportedOperationException();</span>
+    }
+
+    @Override
+    public void close() throws IOException {
+<span class="fc" id="L47">        outputStream.close();</span>
+<span class="fc" id="L48">        cachedOutput.close();</span>
+<span class="fc" id="L49">    }</span>
+
+    public byte[] getBytes() {
+<span class="fc" id="L52">        return cachedOutput.toByteArray();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

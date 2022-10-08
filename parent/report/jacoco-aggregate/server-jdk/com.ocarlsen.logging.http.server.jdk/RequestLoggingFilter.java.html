@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>RequestLoggingFilter.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">report</a> &gt; <a href="../index.html" class="el_bundle">server-jdk</a> &gt; <a href="index.source.html" class="el_package">com.ocarlsen.logging.http.server.jdk</a> &gt; <span class="el_source">RequestLoggingFilter.java</span></div><h1>RequestLoggingFilter.java</h1><pre class="source lang-java linenums">package com.ocarlsen.logging.http.server.jdk;
+
+import com.ocarlsen.logging.LogLevel;
+import com.sun.net.httpserver.Filter;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpContext;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpsServer;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
+
+import static java.lang.invoke.MethodHandles.lookup;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
+import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
+
+<span class="fc" id="L27">public class RequestLoggingFilter extends Filter {</span>
+
+<span class="fc" id="L29">    private static final Logger LOGGER = LoggerFactory.getLogger(lookup().lookupClass());</span>
+
+<span class="fc" id="L31">    private LogLevel logLevel = LogLevel.DEBUG;</span>
+
+    @Override
+    public void doFilter(final HttpExchange exchange, final Chain chain) throws IOException {
+
+<span class="fc" id="L36">        InputStream requestBody = exchange.getRequestBody();</span>
+
+        // TODO: Unit test
+        // Handle content encoding
+<span class="fc" id="L40">        final Headers headers = exchange.getRequestHeaders();</span>
+<span class="fc" id="L41">        final List&lt;String&gt; contentEncoding = headers.get(CONTENT_ENCODING);</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (contentEncoding != null) {</span>
+            // TODO: Generalize as needed, e.g. what about &quot;gz&quot;?
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">            if (contentEncoding.contains(&quot;gzip&quot;)) {</span>
+<span class="fc" id="L45">                requestBody = new GZIPInputStream(requestBody);</span>
+            } else {
+<span class="nc" id="L47">                throw new UnsupportedOperationException(&quot;TODO: Support content-encoding for: &quot; + contentEncoding);</span>
+            }
+        }
+
+<span class="fc" id="L51">        logLevel.log(LOGGER, &quot;Method  : {}&quot;, exchange.getRequestMethod());</span>
+
+<span class="fc" id="L53">        final URI requestURI = buildUri(exchange);</span>
+<span class="fc" id="L54">        logLevel.log(LOGGER, &quot;URL     : {}&quot;, requestURI.toString());</span>
+
+        // TODO: Figure out how to defer string creation as it's expensive and logger may not use it.
+<span class="fc" id="L57">        final String headersFormatted = formatHeaders(headers);</span>
+<span class="fc" id="L58">        logLevel.log(LOGGER, &quot;Headers : {}&quot;, headersFormatted);</span>
+
+<span class="fc" id="L60">        final String bodyText = IOUtils.toString(requestBody, UTF_8);</span>
+<span class="fc" id="L61">        logLevel.log(LOGGER, &quot;Body    : [{}]&quot;, bodyText);</span>
+
+        // InputStream is exhausted so restore it here.
+        // TODO: restore GZIP
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (requestBody.markSupported()) {</span>
+<span class="fc" id="L66">            requestBody.reset();</span>
+        } else {
+<span class="fc" id="L68">            requestBody = new ByteArrayInputStream(bodyText.getBytes(UTF_8));</span>
+<span class="fc" id="L69">            exchange.setStreams(requestBody, exchange.getResponseBody());</span>
+        }
+
+<span class="fc" id="L72">        chain.doFilter(exchange);</span>
+<span class="fc" id="L73">    }</span>
+
+    @Override
+    public String description() {
+<span class="fc" id="L77">        return this.getClass().getSimpleName();</span>
+    }
+
+    public LogLevel getLogLevel() {
+<span class="fc" id="L81">        return logLevel;</span>
+    }
+
+    public void setLogLevel(final LogLevel logLevel) {
+<span class="fc" id="L85">        this.logLevel = logLevel;</span>
+<span class="fc" id="L86">    }</span>
+
+    private String formatHeaders(final Headers headers) {
+<span class="fc" id="L89">        return '{' + headers.entrySet()</span>
+<span class="fc" id="L90">                            .stream()</span>
+<span class="fc" id="L91">                            .map(e -&gt; e.getKey() + &quot;=&quot; + e.getValue())</span>
+<span class="fc" id="L92">                            .collect(joining(&quot;, &quot;)) + '}';</span>
+    }
+
+    private static URI buildUri(final HttpExchange httpExchange) {
+        try {
+<span class="fc" id="L97">            final HttpContext httpContext = httpExchange.getHttpContext();</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">            final String scheme = httpContext.getServer() instanceof HttpsServer ? &quot;https&quot; : &quot;http&quot;;</span>
+<span class="fc" id="L99">            final URI requestURI = httpExchange.getRequestURI();</span>
+<span class="fc" id="L100">            final String path = requestURI.getPath();</span>
+<span class="fc" id="L101">            final String queryParams = requestURI.getQuery();</span>
+<span class="fc" id="L102">            final InetSocketAddress addr = httpExchange.getLocalAddress();</span>
+<span class="fc" id="L103">            final String hostName = addr.getHostName();</span>
+<span class="fc" id="L104">            final int port = addr.getPort();</span>
+<span class="fc" id="L105">            return new URI(scheme, null, hostName, port, path, queryParams, null);</span>
+<span class="nc" id="L106">        } catch (final URISyntaxException e) {</span>
+<span class="nc" id="L107">            throw new RuntimeException(e);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
