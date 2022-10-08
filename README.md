@@ -1,6 +1,9 @@
 # logging-http
 
-TODO: Add badges
+[![Maven Central](https://img.shields.io/maven-central/v/com.ocarlsen.logging.http/logging-http.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.ocarlsen.logging.http%22%20AND%20a:%22logging-http%22)
+[![Build](https://github.com/ocarlsen/logging-http/actions/workflows/build.yml/badge.svg)](https://github.com/ocarlsen/logging-http/actions/workflows/build.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ocarlsen_logging-http&metric=alert_status)](https://sonarcloud.io/dashboard?id=ocarlsen_logging-http)
+[![SonarCloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=ocarlsen_logging-http&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ocarlsen_logging-http)
 
 A library for logging HTTP requests and responses on server and client.
 
