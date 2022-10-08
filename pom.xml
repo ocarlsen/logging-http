@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ocarlsen.logging.http</groupId>
@@ -14,7 +14,7 @@
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>https://raw.githubusercontent.com/ocarlsen/slf4j-log-level/develop/LICENSE</url>
+            <url>https://raw.githubusercontent.com/ocarlsen/logging-http/develop/LICENSE</url>
         </license>
     </licenses>
 
@@ -34,6 +34,10 @@
     </scm>
 
     <distributionManagement>
+        <site>
+            <id>github</id>
+            <url>https://ocarlsen.github.io/logging-http</url>
+        </site>
         <snapshotRepository>
             <id>ossrh</id>
             <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
@@ -42,11 +46,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>11</maven.compiler.release>
 
         <!-- SonarCloud -->
         <sonar.organization>ocarlsen</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
+        <!-- For Site Project Summary, "Java Version" field. -->
+        <maven.compiler.source>${maven.compiler.release}</maven.compiler.source>
+        <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
     </properties>
 
     <modules>
@@ -59,13 +67,6 @@
 
     <build>
         <plugins>
-<!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-            </plugin>
--->
 
             <plugin>
                 <groupId>org.jacoco</groupId>

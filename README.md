@@ -1,5 +1,7 @@
 # logging-http
 
+TODO: Add badges
+
 A library for logging HTTP requests and responses on server and client.
 
 There are different modules for client and server, and modules shared by both:
