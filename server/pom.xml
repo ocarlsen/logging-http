@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
 
     <name>Logging HTTP Server</name>
+    <description>Classes to assist HTTP request/response logging for server.</description>
 
     <modules>
         <module>javaee</module>

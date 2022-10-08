@@ -11,6 +11,7 @@
     <artifactId>client-apache</artifactId>
 
     <name>Logging HTTP Client Apache</name>
+    <description>Classes to assist HTTP request/response logging for Apache client.</description>
 
     <profiles>
         <profile>

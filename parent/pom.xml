@@ -11,6 +11,7 @@
     <packaging>pom</packaging>
 
     <name>Logging HTTP Parent</name>
+    <description>Project for parent POM</description>
 
     <properties>
         <maven.compiler.release>11</maven.compiler.release>

@@ -11,6 +11,9 @@
 
     <artifactId>util</artifactId>
 
+    <name>Logging HTTP Util</name>
+    <description>Utilities for Logging HTTP project</description>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

@@ -11,6 +11,7 @@
     <artifactId>server-jdk</artifactId>
 
     <name>Logging HTTP Server JDK</name>
+    <description>Classes to assist HTTP request/response logging for JDK server.</description>
 
     <dependencies>
         <dependency>
