@@ -4,15 +4,16 @@
     <parent>
         <groupId>com.ocarlsen.logging.http</groupId>
         <artifactId>server</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
 
     <artifactId>server-javaee</artifactId>
 
     <name>Logging HTTP Server Java EE</name>
+    <description>Classes to assist HTTP request/response logging for Java EE server.</description>
 
     <properties>
-        <spring-boot.version>2.0.1.RELEASE</spring-boot.version><!-- Uses Spring 5.0.5.RELEASE -->
+        <spring-boot.version>2.5.12</spring-boot.version>
     </properties>
 
     <dependencies>

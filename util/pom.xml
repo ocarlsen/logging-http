@@ -5,11 +5,14 @@
     <parent>
         <artifactId>parent</artifactId>
         <groupId>com.ocarlsen.logging.http</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>util</artifactId>
+
+    <name>Logging HTTP Util</name>
+    <description>Utilities for Logging HTTP project</description>
 
     <dependencies>
         <dependency>

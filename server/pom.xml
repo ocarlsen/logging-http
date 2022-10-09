@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.ocarlsen.logging.http</groupId>
         <artifactId>parent</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
 
     <name>Logging HTTP Server</name>
+    <description>Classes to assist HTTP request/response logging for server.</description>
 
     <modules>
         <module>javaee</module>

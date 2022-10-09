@@ -5,12 +5,13 @@
     <parent>
         <groupId>com.ocarlsen.logging.http</groupId>
         <artifactId>server</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
 
     <artifactId>server-jdk</artifactId>
 
     <name>Logging HTTP Server JDK</name>
+    <description>Classes to assist HTTP request/response logging for JDK server.</description>
 
     <dependencies>
         <dependency>
