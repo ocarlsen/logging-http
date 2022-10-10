@@ -22,12 +22,12 @@ Logging `org.apache.httpHttpRequestInterceptor`s for request and response.
     <dependency>
         <groupId>com.ocarlsen.logging.http</groupId>
         <artifactId>client-apache</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </dependency>
 
 #### Gradle
 
-    compile 'com.ocarlsen.logging.http:client-apache:1.0.1-SNAPSHOT
+    compile 'com.ocarlsen.logging.http:client-apache:1.0.2-SNAPSHOT
 
 ### spring
 
@@ -38,12 +38,12 @@ Logging `org.springframework.http.clientClientHttpRequestInterceptor`s for reque
     <dependency>
         <groupId>com.ocarlsen.logging.http</groupId>
         <artifactId>client-spring</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </dependency>
 
 #### Gradle
 
-    compile 'com.ocarlsen.logging.http:client-spring:1.0.1-SNAPSHOT
+    compile 'com.ocarlsen.logging.http:client-spring:1.0.2-SNAPSHOT
 
 
 ## parent
@@ -67,12 +67,12 @@ Logging `javax.servlet.Filter`s for request and response.
     <dependency>
         <groupId>com.ocarlsen.logging.http</groupId>
         <artifactId>server-javaee</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </dependency>
 
 #### Gradle
 
-    compile 'com.ocarlsen.logging.http:server-javaee:1.0.1-SNAPSHOT
+    compile 'com.ocarlsen.logging.http:server-javaee:1.0.2-SNAPSHOT
 
 
 
@@ -85,12 +85,12 @@ Logging `com.sun.net.httpserver.Filter`s for request and response.
     <dependency>
         <groupId>com.ocarlsen.logging.http</groupId>
         <artifactId>server-jdk</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </dependency>
 
 #### Gradle
 
-    compile 'com.ocarlsen.logging.http:server-jdk:1.0.1-SNAPSHOT
+    compile 'com.ocarlsen.logging.http:server-jdk:1.0.2-SNAPSHOT
 
 
 ## util

@@ -13,7 +13,7 @@
     <description>Classes to assist HTTP request/response logging for Java EE server.</description>
 
     <properties>
-        <spring-boot.version>2.5.12</spring-boot.version><!-- Uses Spring 5.0.5.RELEASE -->
+        <spring-boot.version>2.5.12</spring-boot.version>
     </properties>
 
     <dependencies>
