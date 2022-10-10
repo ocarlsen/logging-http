@@ -252,17 +252,17 @@ Yay!  You are done with the release.
             echo "Versions match"
         fi
         
-* [ ] Commit, push
+* [x] Commit, push
 
         git add -u
         git commit -m "Updating develop to match main"
-        git push # Release changes
+        git push # Includeds Release changes from earlier
 
-* [ ] Compare this document with [original](/Users/ocarlsen/Documents/Open\ Source/Release.md):
+* [x] Compare this document with [original](/Users/ocarlsen/Documents/Open\ Source/Release.md):
 
-        vdiff Release.md ~/Documents/Open\ Source/Release.md
+        vdiff src/main/audit/Release_${version}.md ~/Documents/Open\ Source/Release.md
 
-* [ ] Move this document to `src/main/audit`:
+* [x] Commit this document to `src/main/audit`:
 
         git add src/main/audit
         git commit -m "Release checklist for ${version} release"
