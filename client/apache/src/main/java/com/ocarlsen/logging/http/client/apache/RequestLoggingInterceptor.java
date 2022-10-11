@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.buildHeaderValueExpression2;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.parseHeaderValues;
 import static java.lang.invoke.MethodHandles.lookup;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -86,9 +88,10 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
         for (final Header header : headers) {
             final String headerName = header.getName();
             final String headerValue = header.getValue();
-            final List<String> values = headerMap.computeIfAbsent(headerName, key -> new ArrayList<>());
-            values.add(headerValue);
+            final List<String> headerValues = parseHeaderValues(headerValue);
+            final List<String> currentValues = headerMap.computeIfAbsent(headerName, key -> new ArrayList<>());
+            currentValues.addAll(headerValues);
         }
-        return headerMap.toString();
+        return buildHeaderValueExpression2(headerMap);
     }
 }

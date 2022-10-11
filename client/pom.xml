@@ -15,10 +15,6 @@
     <name>Logging HTTP Client</name>
     <description>Classes to assist HTTP request/response logging for client.</description>
 
-    <properties>
-        <spring.version>5.0.5.RELEASE</spring.version>
-    </properties>
-
     <modules>
         <module>apache</module>
         <module>spring</module>

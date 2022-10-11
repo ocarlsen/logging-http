@@ -194,7 +194,8 @@ public class RequestLoggingFilterIT {
         final HttpPost httpPost = new HttpPost(uri);
         final Header header1 = new BasicHeader("X-Test", "testvalue");
         final Header header2 = new BasicHeader("Accept", "application/json, text/plain");
-        final Header[] requestHeaders = {header1, header2};
+        final Header header3 = new BasicHeader("Accept-encoding", "gzip, deflate");
+        final Header[] requestHeaders = {header1, header2, header3};
         httpPost.setHeaders(requestHeaders);
         final String requestBodyText = "hello";
         final HttpEntity requestEntity = EntityBuilder.create()

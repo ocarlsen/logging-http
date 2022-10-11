@@ -27,7 +27,7 @@ public class HeaderArgumentMatchersTest {
 
         // When
         final ArgumentMatcher<String> matcher = matchesHeader(headerName, headerValue);
-        final String headerToMatch = "{content-type=[application/json]";     // Case-insensitive header name match works!
+        final String headerToMatch = "content-type:\"application/json\"";     // Case-insensitive header name match works!
         final boolean match = matcher.matches(headerToMatch);
 
         // Then
@@ -60,8 +60,8 @@ public class HeaderArgumentMatchersTest {
 
         // When
         final ArgumentMatcher<String> matcher = matchesHttpHeaders(httpHeaders);
-        final String headerStringToMatch = "{accept=[application/json, text/plain]," +
-                "x-test=[Test Value]}";     // Case-insensitive header name match works!
+        final String headerStringToMatch = "accept:\"application/json\", \"text/plain\"," +
+                "x-test:\"Test Value\"";     // Case-insensitive header name match works!
         final boolean match = matcher.matches(headerStringToMatch);
 
         // Then
@@ -78,8 +78,8 @@ public class HeaderArgumentMatchersTest {
 
         // When
         final ArgumentMatcher<String> matcher = matchesHttpHeaders(httpHeaders);
-        final String headerStringToMatch = "{Accept=[application/json, text/plain]," +
-                "X-Test=[test value]}";     // Case-insensitive header value match does not.
+        final String headerStringToMatch = "{accept:\"application/json\", \"text/plain\"," +
+                "X-Test:\"test value\"}";     // Case-insensitive header value match does not.
         final boolean match = matcher.matches(headerStringToMatch);
 
         // Then
@@ -96,8 +96,8 @@ public class HeaderArgumentMatchersTest {
 
         // When
         final ArgumentMatcher<String> matcher = matchesHeaderArray(headers);
-        final String headerStringToMatch = "{accept=[application/json, text/plain]," +
-                "x-test=[Test Value]}";     // Case-insensitive header name match works!
+        final String headerStringToMatch = "accept:\"application/json\", \"text/plain\"," +
+                "x-test:\"Test Value\"";     // Case-insensitive header name match works!
         final boolean match = matcher.matches(headerStringToMatch);
 
         // Then
@@ -114,8 +114,8 @@ public class HeaderArgumentMatchersTest {
 
         // When
         final ArgumentMatcher<String> matcher = matchesHeaderArray(headers);
-        final String headerStringToMatch = "{Accept=[application/json, text/plain]," +
-                "X-Test=[test value]}";     // Case-insensitive header value match does not.
+        final String headerStringToMatch = "{accept:\"application/json\", \"text/plain\"," +
+                "X-Test:\"test value\"}";     // Case-insensitive header value match does not.
         final boolean match = matcher.matches(headerStringToMatch);
 
         // Then
@@ -132,8 +132,8 @@ public class HeaderArgumentMatchersTest {
 
         // When
         final ArgumentMatcher<String> matcher = matchesHeaders(headers);
-        final String headerStringToMatch = "{accept=[application/json, text/plain]," +
-                "x-test=[Test Value]}";     // Case-insensitive header name match works!
+        final String headerStringToMatch = "accept:\"application/json\", \"text/plain\"," +
+                "x-test:\"Test Value\"";     // Case-insensitive header name match works!
         final boolean match = matcher.matches(headerStringToMatch);
 
         // Then
@@ -150,8 +150,8 @@ public class HeaderArgumentMatchersTest {
 
         // When
         final ArgumentMatcher<String> matcher = matchesHeaders(headers);
-        final String headerStringToMatch = "{Accept=[application/json, text/plain]," +
-                "X-Test=[test value]}";     // Case-insensitive header value match does not.
+        final String headerStringToMatch = "[accept:\"application/json\", \"text/plain\"," +
+                "X-Test:[test value]]";     // Case-insensitive header value match does not.
         final boolean match = matcher.matches(headerStringToMatch);
 
         // Then

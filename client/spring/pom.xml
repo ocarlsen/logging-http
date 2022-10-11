@@ -13,10 +13,6 @@
     <name>Logging HTTP Client Spring</name>
     <description>Classes to assist HTTP request/response logging for Spring client.</description>
 
-    <properties>
-        <spring-boot.version>2.5.12</spring-boot.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>

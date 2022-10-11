@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.buildHeaderValueExpression;
 import static org.hamcrest.Matchers.contains;
 
 public class HeaderMatchers {
@@ -69,8 +70,9 @@ public class HeaderMatchers {
 
             @Override
             public void describeTo(final Description description) {
+                final String text = httpHeaders.toString();
                 description.appendText("HttpHeaders to match ")
-                           .appendText(httpHeaders.toString());
+                           .appendText(text);
             }
         };
     }
@@ -106,10 +108,11 @@ public class HeaderMatchers {
             public void describeTo(final Description description) {
                 final Map<String, String> collect = Arrays.stream(headers).collect(
                         LinkedHashMap::new,
-                        (map, header) -> map.put(header.getName(), List.of(header.getValue()).toString()),
+                        (map, header) -> map.put(header.getName(), header.getValue()),
                         Map::putAll);
+                final String text = buildHeaderValueExpression(collect);
                 description.appendText("Headers to match ")
-                           .appendText(collect.toString());
+                           .appendText(text);
             }
         };
     }

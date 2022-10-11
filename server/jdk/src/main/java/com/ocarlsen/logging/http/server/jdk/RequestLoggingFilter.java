@@ -16,12 +16,14 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import static java.lang.invoke.MethodHandles.lookup;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.joining;
 import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
 
 public class RequestLoggingFilter extends Filter {
@@ -85,11 +87,54 @@ public class RequestLoggingFilter extends Filter {
         this.logLevel = logLevel;
     }
 
+    // TODO: Factor out, this is duplicated
     private String formatHeaders(final Headers headers) {
-        return '{' + headers.entrySet()
-                            .stream()
-                            .map(e -> e.getKey() + "=" + e.getValue())
-                            .collect(joining(", ")) + '}';
+        final StringBuilder buf = new StringBuilder("{");
+        for (Iterator<String> i = headers.keySet().iterator(); i.hasNext(); ) {
+            final String key = i.next();
+            buf.append(key).append(':');
+            List<String> values = headers.get(key);
+            buf.append(buildHeaderValueExpression(values));
+
+            if (i.hasNext()) {
+                buf.append(", ");
+            }
+        }
+        buf.append('}');
+        return buf.toString();
+
+    }
+
+    private String buildHeaderValueExpression(final List<String> headerValues) {
+        final StringBuilder buf = new StringBuilder();
+        for (Iterator<String> i = headerValues.iterator(); i.hasNext(); ) {
+            String headerValue = i.next();
+            List<String> parsedHeaderValues = parseHeaderValues(headerValue);
+            for (Iterator<String> j = parsedHeaderValues.iterator(); j.hasNext(); ) {
+                String parsedHeaderValue = j.next();
+                buf.append('"').append(parsedHeaderValue).append('"');
+
+                if (j.hasNext()) {
+                    buf.append(", ");
+                }
+            }
+
+            if (i.hasNext()) {
+                buf.append(", ");
+            }
+        }
+        return buf.toString();
+    }
+
+    public static List<String> parseHeaderValues(final String headerValue) {
+        // Parse if contains comma, otherwise just wrap in List.
+        if (headerValue.lastIndexOf(',') > 0) {
+            String[] headerValues = headerValue.split("\\s*,\\s*");
+            return Arrays.stream(headerValues)
+                         .collect(Collectors.toList());
+        } else {
+            return List.of(headerValue);
+        }
     }
 
     private static URI buildUri(final HttpExchange httpExchange) {

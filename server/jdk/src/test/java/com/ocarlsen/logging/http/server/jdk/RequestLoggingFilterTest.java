@@ -25,6 +25,7 @@ import java.util.List;
 
 import static com.ocarlsen.logging.LogLevel.DEBUG;
 import static com.ocarlsen.logging.LogLevel.INFO;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.buildHeaderValueExpression;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -34,6 +35,7 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -100,7 +102,7 @@ public class RequestLoggingFilterTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(logger).debug("Method  : {}", method);
         verify(logger).debug("URL     : {}", new URI("https", null, hostName, port, path, queryString, null).toString());
-        verify(logger).debug("Headers : {}", '{' + headerName + '=' + headerValues + '}');
+        verify(logger).debug("Headers : {}", '{' + headerName + ':' + buildHeaderValueExpression(headerValues) + '}');   // TODO: Fix!!!
         verify(logger).debug("Body    : [{}]", requestBody);
 
         // Make sure request not consumed by filter.
@@ -169,7 +171,7 @@ public class RequestLoggingFilterTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(logger).info("Method  : {}", method);
         verify(logger).info("URL     : {}", new URI("https", null, hostName, port, path, queryString, null).toString());
-        verify(logger).info("Headers : {}", '{' + headerName + '=' + headerValues + '}');
+        verify(logger).info("Headers : {}", '{' + headerName + ':' + buildHeaderValueExpression(headerValues) + '}');   // TODO: Fix!!!
         verify(logger).info("Body    : [{}]", requestBody);
 
         // Make sure request not consumed by filter.
