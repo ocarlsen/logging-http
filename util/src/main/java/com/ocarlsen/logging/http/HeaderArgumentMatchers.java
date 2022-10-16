@@ -1,11 +1,11 @@
 package com.ocarlsen.logging.http;
 
+import com.ocarlsen.logging.http.format.StringValuedMapHeaderFormatter;
 import com.sun.net.httpserver.Headers;
 import org.apache.http.Header;
 import org.mockito.ArgumentMatcher;
 import org.springframework.http.HttpHeaders;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,18 @@ public class HeaderArgumentMatchers {
             for (final Header header : headers) {
                 final String headerName = header.getName();
                 final String headerValue = header.getValue();
-                final List<String> headerValues = parseHeaderValues(headerValue);
+
+                // Parse if contains comma, otherwise just wrap in List.
+/*
+        if (headerValue.lastIndexOf(',') > 0) {
+            String[] headerValues = headerValue.split("\\s*,\\s*");
+            return Arrays.stream(headerValues)
+                         .collect(Collectors.toList());
+        } else {
+            return List.of(headerValue);
+        }
+*/
+                final List<String> headerValues = List.of(headerValue);
                 final boolean matches = matchesNameValuePair(argument, headerName, headerValues);
                 if (!matches) {
                     return false;
@@ -65,23 +76,10 @@ public class HeaderArgumentMatchers {
     }
 
     public static String buildHeaderValueExpression(final Map<String, String> headerMap) {
-        final StringBuilder buf = new StringBuilder("{");
-        for (Iterator<String> i = headerMap.keySet().iterator(); i.hasNext(); ) {
-            final String key = i.next();
-            buf.append(key).append(':');
-            String value = headerMap.get(key);
-            List<String> values = parseHeaderValues(value);
-            buf.append(buildHeaderValueExpression(values));
-
-            if (i.hasNext()) {
-                buf.append(", ");
-            }
-        }
-        buf.append('}');
-        return buf.toString();
+        return StringValuedMapHeaderFormatter.INSTANCE.format(headerMap);
     }
 
-    public static <T> String buildHeaderValueExpression2(final Map<String, List<String>> headerMap) {
+    public static String buildHeaderValueExpression2(final Map<String, List<String>> headerMap) {
         final StringBuilder buf = new StringBuilder("{");
         for (Iterator<String> i = headerMap.keySet().iterator(); i.hasNext(); ) {
             final String key = i.next();
@@ -95,17 +93,6 @@ public class HeaderArgumentMatchers {
         }
         buf.append('}');
         return buf.toString();
-    }
-
-    public static List<String> parseHeaderValues(final String headerValue) {
-        // Parse if contains comma, otherwise just wrap in List.
-        if (headerValue.lastIndexOf(',') > 0) {
-            String[] headerValues = headerValue.split("\\s*,\\s*");
-            return Arrays.stream(headerValues)
-                         .collect(Collectors.toList());
-        } else {
-            return List.of(headerValue);
-        }
     }
 
     public static ArgumentMatcher<String> matchesHeaders(final Headers headers) {

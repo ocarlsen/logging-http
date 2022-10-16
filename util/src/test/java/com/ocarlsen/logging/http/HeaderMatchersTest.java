@@ -173,6 +173,6 @@ public class HeaderMatchersTest {
         matcher.describeTo(description);
 
         // Then
-        assertThat(description.toString(), is("Headers to match {X-Test:\"Test Value\", Accept:\"application/json\", \"text/plain\"}"));
+        assertThat(description.toString(), is("Headers to match {X-Test:\"Test Value\", Accept:\"application/json, text/plain\"}"));
     }
 }

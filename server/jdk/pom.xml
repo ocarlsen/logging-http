@@ -28,7 +28,6 @@
             <groupId>com.ocarlsen.logging.http</groupId>
             <artifactId>util</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
 
     </dependencies>

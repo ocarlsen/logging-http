@@ -1,6 +1,8 @@
 package com.ocarlsen.logging.http.server.jdk;
 
 import com.ocarlsen.logging.LogLevel;
+import com.ocarlsen.logging.http.format.HeaderFormatter;
+import com.ocarlsen.logging.http.format.JdkHeaderFormatter;
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpContext;
@@ -16,10 +18,7 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import static java.lang.invoke.MethodHandles.lookup;
@@ -29,6 +28,8 @@ import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
 public class RequestLoggingFilter extends Filter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(lookup().lookupClass());
+
+    private final HeaderFormatter<Headers> headerFormatter = JdkHeaderFormatter.INSTANCE;
 
     private LogLevel logLevel = LogLevel.DEBUG;
 
@@ -56,7 +57,7 @@ public class RequestLoggingFilter extends Filter {
         logLevel.log(LOGGER, "URL     : {}", requestURI.toString());
 
         // TODO: Figure out how to defer string creation as it's expensive and logger may not use it.
-        final String headersFormatted = formatHeaders(headers);
+        final String headersFormatted = headerFormatter.format(headers);
         logLevel.log(LOGGER, "Headers : {}", headersFormatted);
 
         final String bodyText = IOUtils.toString(requestBody, UTF_8);
@@ -85,56 +86,6 @@ public class RequestLoggingFilter extends Filter {
 
     public void setLogLevel(final LogLevel logLevel) {
         this.logLevel = logLevel;
-    }
-
-    // TODO: Factor out, this is duplicated
-    private String formatHeaders(final Headers headers) {
-        final StringBuilder buf = new StringBuilder("{");
-        for (Iterator<String> i = headers.keySet().iterator(); i.hasNext(); ) {
-            final String key = i.next();
-            buf.append(key).append(':');
-            List<String> values = headers.get(key);
-            buf.append(buildHeaderValueExpression(values));
-
-            if (i.hasNext()) {
-                buf.append(", ");
-            }
-        }
-        buf.append('}');
-        return buf.toString();
-
-    }
-
-    private String buildHeaderValueExpression(final List<String> headerValues) {
-        final StringBuilder buf = new StringBuilder();
-        for (Iterator<String> i = headerValues.iterator(); i.hasNext(); ) {
-            String headerValue = i.next();
-            List<String> parsedHeaderValues = parseHeaderValues(headerValue);
-            for (Iterator<String> j = parsedHeaderValues.iterator(); j.hasNext(); ) {
-                String parsedHeaderValue = j.next();
-                buf.append('"').append(parsedHeaderValue).append('"');
-
-                if (j.hasNext()) {
-                    buf.append(", ");
-                }
-            }
-
-            if (i.hasNext()) {
-                buf.append(", ");
-            }
-        }
-        return buf.toString();
-    }
-
-    public static List<String> parseHeaderValues(final String headerValue) {
-        // Parse if contains comma, otherwise just wrap in List.
-        if (headerValue.lastIndexOf(',') > 0) {
-            String[] headerValues = headerValue.split("\\s*,\\s*");
-            return Arrays.stream(headerValues)
-                         .collect(Collectors.toList());
-        } else {
-            return List.of(headerValue);
-        }
     }
 
     private static URI buildUri(final HttpExchange httpExchange) {

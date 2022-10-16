@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import static com.ocarlsen.logging.http.HeaderArgumentMatchers.buildHeaderValueExpression2;
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.parseHeaderValues;
 import static java.lang.invoke.MethodHandles.lookup;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -88,7 +87,18 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
         for (final Header header : headers) {
             final String headerName = header.getName();
             final String headerValue = header.getValue();
-            final List<String> headerValues = parseHeaderValues(headerValue);
+
+            // Parse if contains comma, otherwise just wrap in List.
+/*
+        if (headerValue.lastIndexOf(',') > 0) {
+            String[] headerValues = headerValue.split("\\s*,\\s*");
+            return Arrays.stream(headerValues)
+                         .collect(Collectors.toList());
+        } else {
+            return List.of(headerValue);
+        }
+*/
+            final List<String> headerValues = List.of(headerValue);
             final List<String> currentValues = headerMap.computeIfAbsent(headerName, key -> new ArrayList<>());
             currentValues.addAll(headerValues);
         }

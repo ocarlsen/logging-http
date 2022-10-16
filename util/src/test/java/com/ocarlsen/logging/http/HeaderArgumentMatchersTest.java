@@ -96,7 +96,7 @@ public class HeaderArgumentMatchersTest {
 
         // When
         final ArgumentMatcher<String> matcher = matchesHeaderArray(headers);
-        final String headerStringToMatch = "accept:\"application/json\", \"text/plain\"," +
+        final String headerStringToMatch = "accept:\"application/json, text/plain\"," +
                 "x-test:\"Test Value\"";     // Case-insensitive header name match works!
         final boolean match = matcher.matches(headerStringToMatch);
 

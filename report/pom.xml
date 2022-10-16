@@ -11,6 +11,9 @@
 
     <artifactId>report</artifactId>
 
+    <name>Logging HTTP Reports</name>
+    <description>Project for reports</description>
+
     <dependencies>
         <dependency>
             <groupId>com.ocarlsen.logging.http</groupId>
