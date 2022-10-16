@@ -170,7 +170,7 @@ public class RequestLoggingFilterTest {
         final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
         verify(logger).info("Method  : {}", method);
         verify(logger).info("URL     : {}", new URI("https", null, hostName, port, path, queryString, null).toString());
-        verify(logger).info("Headers : {}", '{' + headerName + ':' + buildHeaderValueExpression(headerValues) + '}');   // TODO: Fix!!!
+        verify(logger).info("Headers : {}", '{' + headerName + ':' + buildHeaderValueExpression(headerValues) + '}');
         verify(logger).info("Body    : [{}]", requestBody);
 
         // Make sure request not consumed by filter.

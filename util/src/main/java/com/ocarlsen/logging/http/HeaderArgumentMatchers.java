@@ -67,6 +67,10 @@ public class HeaderArgumentMatchers {
         };
     }
 
+    public static String buildHeaderValueExpression(final String headerValue) {
+        return '"' + headerValue + '"';
+    }
+
     public static String buildHeaderValueExpression(final List<String> headerValues) {
         // Copied from HttpHeaders#formatHeaders.
         return (headerValues.size() == 1 ?

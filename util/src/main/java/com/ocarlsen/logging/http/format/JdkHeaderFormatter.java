@@ -4,7 +4,8 @@ import com.sun.net.httpserver.Headers;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.buildHeaderValueExpression;
 
 public enum JdkHeaderFormatter implements HeaderFormatter<Headers> {
     INSTANCE;
@@ -24,13 +25,5 @@ public enum JdkHeaderFormatter implements HeaderFormatter<Headers> {
         }
         buf.append('}');
         return buf.toString();
-    }
-
-    private String buildHeaderValueExpression(final List<String> headerValues) {
-        // Copied from HttpHeaders#formatHeaders.
-        return (headerValues.size() == 1 ?
-                "\"" + headerValues.get(0) + "\"" :
-                headerValues.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(", ")));
-
     }
 }

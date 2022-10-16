@@ -3,6 +3,8 @@ package com.ocarlsen.logging.http.format;
 import java.util.Iterator;
 import java.util.Map;
 
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.buildHeaderValueExpression;
+
 public enum StringValuedMapHeaderFormatter implements HeaderFormatter<Map<String, String>> {
     INSTANCE;
 
@@ -13,9 +15,7 @@ public enum StringValuedMapHeaderFormatter implements HeaderFormatter<Map<String
             final String key = i.next();
             buf.append(key).append(':');
             String value = headers.get(key);
-            String quotedValue = '"' + value + '"';
-
-            buf.append(quotedValue);
+            buf.append(buildHeaderValueExpression(value));
 
             if (i.hasNext()) {
                 buf.append(", ");

@@ -1,25 +1,20 @@
 package com.ocarlsen.logging.http.format;
 
-import org.junit.Test;
-
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+public class StringValuedMapHeaderFormatterTest extends BaseHeaderFormatterTest<Map<String, String>> {
 
-public class StringValuedMapHeaderFormatterTest {
-
-    @Test
-    public void format() {
-        final Map<String, String> headers = new HashMap<String, String>();
+    @Override
+    protected Map<String, String> buildHeaders() {
+        final Map<String, String> headers = new TreeMap<String, String>();
         headers.put("headerName1", "headerValue1.1, headerValue1.2");
-        //headers.put("headerName2", "headerValue2.1");
+        headers.put("headerName2", "headerValue2.1");
+        return headers;
+    }
 
-        String formattedHeaders = StringValuedMapHeaderFormatter.INSTANCE.format(headers);
-
-        // TODO: Make the order predictable.
-        // assertThat(formattedHeaders, is("{headerName1:\"headerValue1.1, headerValue1.2\", Headername2:\"headerValue2.1\"}"));
-        assertThat(formattedHeaders, is("{headerName1:\"headerValue1.1, headerValue1.2\"}"));
+    @Override
+    protected HeaderFormatter<Map<String, String>> buildHeaderFormatter() {
+        return StringValuedMapHeaderFormatter.INSTANCE;
     }
 }
