@@ -13,7 +13,7 @@ public enum StringValuedMapHeaderFormatter implements HeaderFormatter<Map<String
             final String key = i.next();
             buf.append(key).append(':');
             String value = headers.get(key);
-            String quotedValue = '"' + value + '"'; // TODO: Find utility
+            String quotedValue = '"' + value + '"';
 
             buf.append(quotedValue);
 

@@ -1,6 +1,8 @@
 package com.ocarlsen.logging.http.client.apache;
 
 import com.ocarlsen.logging.http.GzipContentEnablingEntity;
+import com.ocarlsen.logging.http.format.ArrayHeaderFormatter;
+import com.ocarlsen.logging.http.format.HeaderFormatter;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
@@ -28,6 +30,8 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(lookup().lookupClass());
 
+    private final HeaderFormatter<Header[]> headerFormatter = ArrayHeaderFormatter.INSTANCE;
+
     @Override
     public void process(final HttpRequest httpRequest, final HttpContext httpContext) throws IOException {
         logRequest(httpRequest);
@@ -37,7 +41,7 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
         LOGGER.debug("Method  : {}", request.getRequestLine().getMethod());
         LOGGER.debug("URL     : {}", request.getRequestLine().getUri());
 
-        final String headersFormatted = formatHeaders(request.getAllHeaders());
+        final String headersFormatted = headerFormatter.format(request.getAllHeaders());
         LOGGER.debug("Headers : {}", headersFormatted);
 
         final String body;
@@ -78,30 +82,5 @@ public class RequestLoggingInterceptor implements HttpRequestInterceptor {
             body = "";
         }
         LOGGER.debug("Body    : [{}]", body);
-    }
-
-
-    // TODO: Factor out, this is duplicated
-    private String formatHeaders(final Header[] headers) {
-        final LinkedHashMap<String, List<String>> headerMap = new LinkedHashMap<>();
-        for (final Header header : headers) {
-            final String headerName = header.getName();
-            final String headerValue = header.getValue();
-
-            // Parse if contains comma, otherwise just wrap in List.
-/*
-        if (headerValue.lastIndexOf(',') > 0) {
-            String[] headerValues = headerValue.split("\\s*,\\s*");
-            return Arrays.stream(headerValues)
-                         .collect(Collectors.toList());
-        } else {
-            return List.of(headerValue);
-        }
-*/
-            final List<String> headerValues = List.of(headerValue);
-            final List<String> currentValues = headerMap.computeIfAbsent(headerName, key -> new ArrayList<>());
-            currentValues.addAll(headerValues);
-        }
-        return buildHeaderValueExpression2(headerMap);
     }
 }
