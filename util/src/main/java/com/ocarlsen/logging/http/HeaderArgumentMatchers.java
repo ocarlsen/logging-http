@@ -1,6 +1,5 @@
 package com.ocarlsen.logging.http;
 
-import com.ocarlsen.logging.http.format.StringValuedMapHeaderFormatter;
 import com.sun.net.httpserver.Headers;
 import org.apache.http.Header;
 import org.mockito.ArgumentMatcher;
@@ -75,11 +74,7 @@ public class HeaderArgumentMatchers {
                 headerValues.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(", ")));
     }
 
-    public static String buildHeaderValueExpression(final Map<String, String> headerMap) {
-        return StringValuedMapHeaderFormatter.INSTANCE.format(headerMap);
-    }
-
-    public static String buildHeaderValueExpression2(final Map<String, List<String>> headerMap) {
+    public static String buildHeaderValueExpression(final Map<String, List<String>> headerMap) {
         final StringBuilder buf = new StringBuilder("{");
         for (Iterator<String> i = headerMap.keySet().iterator(); i.hasNext(); ) {
             final String key = i.next();

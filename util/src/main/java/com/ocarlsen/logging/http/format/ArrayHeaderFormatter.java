@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.buildHeaderValueExpression2;
+import static com.ocarlsen.logging.http.HeaderArgumentMatchers.buildHeaderValueExpression;
 
 public enum ArrayHeaderFormatter implements HeaderFormatter<Header[]> {
     INSTANCE;
@@ -21,6 +21,6 @@ public enum ArrayHeaderFormatter implements HeaderFormatter<Header[]> {
             final List<String> currentValues = headerMap.computeIfAbsent(headerName, key -> new ArrayList<>());
             currentValues.addAll(headerValues);
         }
-        return buildHeaderValueExpression2(headerMap);
+        return buildHeaderValueExpression(headerMap);
     }
 }

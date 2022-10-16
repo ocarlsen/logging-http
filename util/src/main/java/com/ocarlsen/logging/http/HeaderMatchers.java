@@ -1,5 +1,6 @@
 package com.ocarlsen.logging.http;
 
+import com.ocarlsen.logging.http.format.StringValuedMapHeaderFormatter;
 import com.sun.net.httpserver.Headers;
 import org.apache.http.Header;
 import org.hamcrest.BaseMatcher;
@@ -12,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.ocarlsen.logging.http.HeaderArgumentMatchers.buildHeaderValueExpression;
 import static org.hamcrest.Matchers.contains;
 
 public class HeaderMatchers {
@@ -110,7 +110,7 @@ public class HeaderMatchers {
                         LinkedHashMap::new,
                         (map, header) -> map.put(header.getName(), header.getValue()),
                         Map::putAll);
-                final String text = buildHeaderValueExpression(collect);
+                final String text = StringValuedMapHeaderFormatter.INSTANCE.format(collect);
                 description.appendText("Headers to match ")
                            .appendText(text);
             }
