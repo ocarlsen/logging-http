@@ -49,18 +49,6 @@ Run the following from your project directory to generate this checklist:
 * [ ] Fix errors, if any
 
 		[ERROR] Failed to execute goal org.sonatype.plugins:nexus-staging-maven-plugin:1.6.13:deploy (injected-nexus-deploy) on project mock-slf4j-impl: Failed to deploy artifacts: Could not transfer artifact com.ocarlsen.test:mock-slf4j-impl:jar:2.0.0-20220925.162838-1 from/to ossrh (https://s01.oss.sonatype.org/content/repositories/snapshots): Transfer failed for https://s01.oss.sonatype.org/content/repositories/snapshots/com/ocarlsen/test/mock-slf4j-impl/2.0.0-SNAPSHOT/mock-slf4j-impl-2.0.0-20220925.162838-1.jar 401 Unauthorized -> [Help 1]
-		
-	Check `~/.m2/settings.xml`:
-	
-		<settings>
-		  <servers>
-		    <server>
-		      <id>ossrh</id>
-		      <username>ocarlsen</username>
-		      <password>LodmmdYC2Hp6%</password>
-		    </server>
-		  </servers>
-		</settings>
 
 * [x] Confirm in [Staging](https://s01.oss.sonatype.org/content/groups/staging/com/ocarlsen/) repo
 	* https://s01.oss.sonatype.org/content/groups/staging/com/ocarlsen/logging/http/logging-http/1.0.0-SNAPSHOT/
